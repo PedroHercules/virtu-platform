@@ -1,68 +1,70 @@
-/* 1. Use a more-intuitive box-sizing model */
+/* Reset CSS */
 *,
 *::before,
 *::after {
-   box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* 2. Remove default margin */
-* {
-   margin: 0;
+html {
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-   /* 3. Add accessible line-height */
-   line-height: 1.5;
-   /* 4. Improve text rendering */
-   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  text-rendering: optimizeSpeed;
 }
 
-/* 5. Improve media defaults */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+}
+
+a {
+  text-decoration-skip-ink: auto;
+}
+
 img,
-picture,
-video,
-canvas,
-svg {
-   display: block;
-   max-width: 100%;
+picture {
+  max-width: 100%;
+  display: block;
 }
 
-/* 6. Inherit fonts for form controls */
 input,
 button,
 textarea,
 select {
-   font: inherit;
+  font: inherit;
 }
 
-/* 7. Avoid text overflows */
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-   overflow-wrap: break-word;
-}
-
-/* 8. Improve line wrapping */
-p {
-   text-wrap: pretty;
-}
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-   text-wrap: balance;
-}
-
-/*
-    9. Create a root stacking context
-  */
-#root,
-#__next {
-   isolation: isolate;
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
