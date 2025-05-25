@@ -7,6 +7,21 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-inter)"],
       },
+      colors: {
+        background: "#0A0A0B",
+        foreground: "#F5F5F5",
+        muted: "#1F1F23",
+        primary: {
+          DEFAULT: "#DC2626",
+          hover: "#B91C1C",
+        },
+        secondary: {
+          DEFAULT: "#1E40AF",
+          hover: "#1E3A8A",
+        },
+        border: "#27272A",
+        input: "#18181B",
+      },
     },
   },
   content: [
