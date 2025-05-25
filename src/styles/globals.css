@@ -3,11 +3,11 @@
 @import 'tailwindcss/utilities';
 
 :root {
-  --background: #0A0A0B;
-  --foreground: #F5F5F5;
-  --muted: #1F1F23;
-  --border: #27272A;
-  --input: #18181B;
+  --background: #1E1E2E;
+  --foreground: #F2F2F2;
+  --muted: #282838;
+  --border: #373750;
+  --input: #24243A;
 }
 
 body {

@@ -8,27 +8,37 @@ const config: Config = {
         sans: ["var(--font-inter)"],
       },
       colors: {
-        background: "#0A0A0B",
-        foreground: "#F5F5F5",
-        muted: "#1F1F23",
+        background: "#1E1E2E", // Azul escuro suave
+        foreground: "#F2F2F2",
+        muted: "#282838", // Azul escuro um pouco mais claro
         primary: {
-          DEFAULT: "#DC2626",
-          hover: "#B91C1C",
+          DEFAULT: "#C41E3A", // Vermelho profundo
+          hover: "#A91B33",
         },
         secondary: {
-          DEFAULT: "#1E40AF",
-          hover: "#1E3A8A",
+          DEFAULT: "#2A2A3C", // Azul escuro mais claro
+          hover: "#313145",
         },
-        border: "#27272A",
-        input: "#18181B",
+        accent: {
+          DEFAULT: "#D4AF37", // Dourado mais vibrante
+          hover: "#BF9F30",
+        },
+        border: "#373750", // Azul acinzentado
+        input: "#24243A", // Azul escuro para inputs
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-subtle":
+          "linear-gradient(to right, var(--tw-gradient-stops))",
       },
     },
   },
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/ui/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/modules/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/styles/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/styles/globals.css",
   ],
