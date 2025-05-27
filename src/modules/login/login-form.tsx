@@ -1,6 +1,49 @@
+"use client";
+
 import * as React from "react";
+import * as z from "zod";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
+const loginSchema = z.object({
+  email: z.string().email("E-mail inválido"),
+  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+});
 
 export const LoginForm: React.FC = () => {
+  const router = useRouter();
+
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const handleSubmit = async (data: z.infer<typeof loginSchema>) => {
+    try {
+      const response = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+
+      if (response?.error) {
+        throw new Error(response.error);
+      }
+
+      console.log("Login bem-sucedido:", response);
+
+      router.push("/");
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      // Aqui você pode adicionar lógica para lidar com erros, como exibir uma mensagem de erro
+    }
+  };
   return (
     <div className="flex flex-col items-center w-full">
       <div className="text-center mb-16">
@@ -10,7 +53,10 @@ export const LoginForm: React.FC = () => {
         </p>
       </div>
 
-      <form className="flex flex-col gap-10 w-full">
+      <form
+        className="flex flex-col gap-10 w-full"
+        onSubmit={form.handleSubmit(handleSubmit)}
+      >
         <div className="space-y-4">
           <label
             htmlFor="email"
@@ -21,10 +67,10 @@ export const LoginForm: React.FC = () => {
           <input
             type="email"
             id="email"
-            name="email"
             required
             placeholder="Digite seu e-mail"
             className="block w-full px-6 py-4 bg-input/50 border border-accent/20 rounded-lg text-lg focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 text-foreground placeholder:text-foreground/40 transition-colors"
+            {...form.register("email")}
           />
         </div>
         <div className="space-y-4">
@@ -37,10 +83,10 @@ export const LoginForm: React.FC = () => {
           <input
             type="password"
             id="password"
-            name="password"
             required
             placeholder="Digite sua senha"
             className="block w-full px-6 py-4 bg-input/50 border border-accent/20 rounded-lg text-lg focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 text-foreground placeholder:text-foreground/40 transition-colors"
+            {...form.register("password")}
           />
         </div>
         <button
