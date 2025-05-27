@@ -17,10 +17,25 @@ export const Sidebar = () => {
   const pathname = usePathname();
 
   const menuItems = [
-    { name: "Dashboard", path: homeRoutes.dashboard, icon: LayoutDashboard },
-    { name: "Alunos", path: homeRoutes.students, icon: Users },
-    { name: "Graduações", path: homeRoutes.graduations, icon: GraduationCap },
-    { name: "Pagamentos", path: homeRoutes.payments, icon: Wallet },
+    {
+      name: "Dashboard",
+      path: homeRoutes.dashboard,
+      icon: LayoutDashboard,
+      disabled: false,
+    },
+    { name: "Alunos", path: homeRoutes.students, icon: Users, disabled: false },
+    {
+      name: "Graduações",
+      path: homeRoutes.graduations,
+      icon: GraduationCap,
+      disabled: true,
+    },
+    {
+      name: "Pagamentos",
+      path: homeRoutes.payments,
+      icon: Wallet,
+      disabled: true,
+    },
   ];
 
   return (
@@ -33,17 +48,24 @@ export const Sidebar = () => {
         <ul className="space-y-2">
           {menuItems.map((item) => (
             <li key={item.path}>
-              <Link
-                href={item.path}
-                className={`flex items-center gap-3 rounded-lg px-4 py-2.5 transition-colors ${
-                  pathname === item.path
-                    ? "bg-gray-700 text-white"
-                    : "text-gray-400 hover:bg-gray-700 hover:text-white"
-                }`}
-              >
-                <item.icon size={20} />
-                <span className="font-medium">{item.name}</span>
-              </Link>
+              {item.disabled ? (
+                <div className="flex cursor-not-allowed items-center gap-3 rounded-lg px-4 py-2.5 opacity-50">
+                  <item.icon size={20} className="text-gray-400" />
+                  <span className="font-medium text-gray-400">{item.name}</span>
+                </div>
+              ) : (
+                <Link
+                  href={item.path}
+                  className={`flex items-center gap-3 rounded-lg px-4 py-2.5 transition-colors ${
+                    pathname === item.path
+                      ? "bg-gray-700 text-white"
+                      : "text-gray-400 hover:bg-gray-700 hover:text-white"
+                  }`}
+                >
+                  <item.icon size={20} />
+                  <span className="font-medium">{item.name}</span>
+                </Link>
+              )}
             </li>
           ))}
         </ul>
