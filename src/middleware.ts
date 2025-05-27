@@ -1,6 +1,9 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { homeRoutes } from "./routes/home";
+import { authRoutes } from "./routes/auth";
+import { COOKIES } from "./utils/cookies";
 
 function isTokenExpired(expiresIn: number | string | undefined) {
   if (!expiresIn) return true;
@@ -26,7 +29,9 @@ export async function middleware(request: NextRequest) {
         token.expiresIn &&
         !isTokenExpired(token.expiresIn as number)
       ) {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        return NextResponse.redirect(
+          new URL(homeRoutes.dashboard, request.url)
+        );
       }
       // Se não tiver token ou token expirado, permite acessar o login
       return NextResponse.next();
@@ -41,26 +46,26 @@ export async function middleware(request: NextRequest) {
       if (token) {
         // Se tem token mas está expirado, limpar cookies
         const response = NextResponse.redirect(
-          new URL("/auth/login", request.url)
+          new URL(authRoutes.login, request.url)
         );
-        response.cookies.delete("next-auth.session-token");
-        response.cookies.delete("next-auth.csrf-token");
+        response.cookies.delete(COOKIES.SESSION_TOKEN);
+        response.cookies.delete(COOKIES.CSRF_TOKEN);
         return response;
       }
       // Se não tem token
-      return NextResponse.redirect(new URL("/auth/login", request.url));
+      return NextResponse.redirect(new URL(authRoutes.login, request.url));
     }
 
     // Redirecionar rota raiz para dashboard
     if (request.nextUrl.pathname === "/") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL(homeRoutes.dashboard, request.url));
     }
 
     return NextResponse.next();
   } catch (error) {
     console.error("Error in middleware:", error);
     // If there's an error getting the token, redirect to the login page
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+    return NextResponse.redirect(new URL(authRoutes.login, request.url));
   }
 }
 
