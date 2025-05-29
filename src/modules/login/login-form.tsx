@@ -83,7 +83,7 @@ export const LoginForm: React.FC = () => {
           {...form.register("password")}
         />
 
-        <Button variant="primary" size="lg" className="mt-2">
+        <Button variant="accent" size="lg" className="mt-2">
           Acessar plataforma
         </Button>
       </form>
