@@ -39,31 +39,45 @@ export const Sidebar = () => {
   ];
 
   return (
-    <aside className="flex h-screen w-64 flex-col bg-gray-800 p-4 text-white">
-      <div className="mb-8 border-b border-gray-700 pb-4">
-        <h1 className="text-xl font-bold">Virtu</h1>
+    <aside className="flex h-screen w-64 flex-col bg-gradient-to-b from-muted to-background p-5 border-r border-border">
+      <div className="mb-10">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
+          Virtu
+        </h1>
       </div>
 
       <nav className="flex-1">
-        <ul className="space-y-2">
+        <ul className="space-y-1.5">
           {menuItems.map((item) => (
             <li key={item.path}>
               {item.disabled ? (
-                <div className="flex cursor-not-allowed items-center gap-3 rounded-lg px-4 py-2.5 opacity-50">
-                  <item.icon size={20} className="text-gray-400" />
-                  <span className="font-medium text-gray-400">{item.name}</span>
+                <div className="flex cursor-not-allowed items-center gap-3 rounded-lg px-4 py-3 opacity-40">
+                  <item.icon size={18} className="text-foreground" />
+                  <span className="font-medium text-foreground text-sm">
+                    {item.name}
+                  </span>
                 </div>
               ) : (
                 <Link
                   href={item.path}
-                  className={`flex items-center gap-3 rounded-lg px-4 py-2.5 transition-colors ${
+                  className={`group flex items-center gap-3 rounded-lg px-4 py-3 transition-all duration-200 ${
                     pathname === item.path
-                      ? "bg-gray-700 text-white"
-                      : "text-gray-400 hover:bg-gray-700 hover:text-white"
+                      ? "bg-accent/10 text-accent"
+                      : "text-foreground/70 hover:bg-accent/5 hover:text-accent"
                   }`}
                 >
-                  <item.icon size={20} />
-                  <span className="font-medium">{item.name}</span>
+                  <item.icon
+                    size={18}
+                    className={`transition-transform duration-200 ${
+                      pathname === item.path
+                        ? "text-accent"
+                        : "text-foreground/70 group-hover:text-accent"
+                    }`}
+                  />
+                  <span className="font-medium text-sm">{item.name}</span>
+                  {pathname === item.path && (
+                    <div className="ml-auto h-1.5 w-1.5 rounded-full bg-accent" />
+                  )}
                 </Link>
               )}
             </li>
@@ -71,18 +85,28 @@ export const Sidebar = () => {
         </ul>
       </nav>
 
-      <div className="flex items-center justify-between border-t border-gray-700 pt-4">
+      <div className="flex items-center justify-between pt-4 border-t border-border">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-gray-600" />
-          <span className="text-sm font-medium">{session?.user?.username}</span>
+          <div className="relative">
+            <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-accent to-primary flex items-center justify-center text-white font-medium">
+              {session?.user?.username?.[0]?.toUpperCase()}
+            </div>
+            <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background bg-accent" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-foreground">
+              {session?.user?.username}
+            </span>
+            <span className="text-xs text-foreground/60">Online</span>
+          </div>
         </div>
 
         <button
           onClick={() => signOut()}
-          className="flex items-center justify-center rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white"
+          className="flex items-center justify-center rounded-lg p-2 text-foreground/70 transition-colors hover:bg-accent/10 hover:text-accent"
           title="Sair"
         >
-          <LogOut size={20} />
+          <LogOut size={18} />
         </button>
       </div>
     </aside>
