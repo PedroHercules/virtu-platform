@@ -1,168 +1,63 @@
-import { cn } from "@/lib/utils";
-import { cva, type VariantProps } from "class-variance-authority";
+import * as React from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { forwardRef, InputHTMLAttributes, useState } from "react";
-
-const inputVariants = cva(
-  [
-    // Base
-    "peer w-full transition-colors duration-200 ease-linear",
-    "text-foreground bg-transparent",
-    "rounded-lg border border-accent/20",
-
-    // Placeholder
-    "placeholder:text-foreground/50",
-    "placeholder:transition-opacity placeholder:duration-200",
-
-    // Focus
-    "focus-visible:outline-none",
-    "focus-visible:ring-1",
-    "focus-visible:ring-accent",
-    "focus-visible:border-accent",
-    "focus-visible:ring-offset-2",
-    "focus-visible:ring-offset-background",
-
-    // Disabled
-    "disabled:cursor-not-allowed",
-    "disabled:opacity-50",
-    "disabled:bg-transparent",
-    "disabled:border-border",
-    "disabled:placeholder:text-foreground/30",
-
-    // Invalid/Error
-    "aria-[invalid=true]:border-primary",
-    "aria-[invalid=true]:text-primary",
-    "invalid:border-primary",
-    "invalid:text-primary",
-    "focus-visible:invalid:border-primary",
-    "focus-visible:invalid:ring-primary",
-
-    // File input reset
-    "file:border-0",
-    "file:bg-transparent",
-  ].join(" "),
-  {
-    variants: {
-      variant: {
-        default: "",
-        error: "border-primary text-primary focus-visible:ring-primary",
-      },
-      size: {
-        sm: "h-8 px-3 py-1 text-xs",
-        default: "h-10 px-4 py-2 text-sm",
-        md: "h-12 px-4 py-3 text-base",
-        lg: "h-14 px-6 py-4 text-lg",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-);
+import { cn } from "@/lib/utils";
+import { Label } from "./label";
 
 export interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size">,
-    VariantProps<typeof inputVariants> {
-  error?: string;
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  inputSize?: "default" | "xs" | "sm" | "md" | "lg" | "textarea";
   label?: string;
-  startIcon?: React.ReactNode;
-  endIcon?: React.ReactNode;
-  fullWidth?: boolean;
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      className,
-      type = "text",
-      variant,
-      size,
-      error,
-      label,
-      startIcon,
-      endIcon,
-      fullWidth,
-      id,
-      ...props
-    },
-    ref
-  ) => {
-    const inputId = id || `input-${Math.random().toString(36).slice(2, 11)}`;
-    const errorId = `${inputId}-error`;
-    const hasError = Boolean(error);
-    const [showPassword, setShowPassword] = useState(false);
-    const isPassword = type === "password";
+const inputSizes = {
+  xs: "h-6 text-xs px-2",
+  sm: "h-8 text-sm px-2",
+  default: "h-10 text-base px-3",
+  md: "h-12 text-lg px-4",
+  lg: "h-14 text-xl px-4",
+  textarea: "h-32 py-2 px-3 resize-y",
+};
 
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, inputSize = "md", label, ...props }, ref) => {
+    const [showPassword, setShowPassword] = React.useState(false);
+    const isPasswordType = type === "password";
+
+    const togglePassword = () => {
+      setShowPassword((prev) => !prev);
+    };
     return (
-      <div className={cn("space-y-2", fullWidth ? "w-full" : "max-w-sm")}>
-        {label && (
-          <label
-            htmlFor={inputId}
-            className="block text-lg font-medium text-foreground/90"
-          >
-            {label}
-          </label>
-        )}
+      <div className="flex flex-col gap-1.5">
+        {label && <Label htmlFor={props.id}>{label}</Label>}
         <div className="relative">
-          {startIcon && (
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-foreground/50">
-              {startIcon}
-            </div>
-          )}
           <input
-            type={isPassword && showPassword ? "text" : type}
-            id={inputId}
+            type={isPasswordType ? (showPassword ? "text" : "password") : type}
             className={cn(
-              inputVariants({
-                variant: hasError ? "error" : variant,
-                size,
-              }),
-              startIcon && "pl-10",
-              endIcon && "pr-10",
+              "flex w-full rounded-md border border-border bg-input text-foreground ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+              inputSizes[inputSize],
               className
             )}
-            aria-invalid={hasError}
-            aria-describedby={hasError ? errorId : undefined}
             ref={ref}
             {...props}
           />
-          {(endIcon || isPassword) && (
-            <div
-              className={cn(
-                "absolute inset-y-0 right-3 flex items-center text-foreground/50",
-                isPassword && "cursor-pointer"
-              )}
-              onClick={
-                isPassword ? () => setShowPassword(!showPassword) : undefined
-              }
+          {isPasswordType && (
+            <button
+              type="button"
+              onClick={togglePassword}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground"
             >
-              {isPassword ? (
-                showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )
+              {showPassword ? (
+                <EyeOff className="h-5 w-5" />
               ) : (
-                endIcon
+                <Eye className="h-5 w-5" />
               )}
-            </div>
+            </button>
           )}
         </div>
-        {error && (
-          <p
-            id={errorId}
-            className="text-sm font-medium text-primary"
-            role="alert"
-          >
-            {error}
-          </p>
-        )}
       </div>
     );
   }
 );
-
 Input.displayName = "Input";
 
-export { Input, inputVariants };
+export { Input };

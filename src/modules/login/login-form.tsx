@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 
 const loginSchema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -56,37 +57,53 @@ export const LoginForm: React.FC = () => {
           Acesse sua conta na Plataforma Virtu
         </p>
       </div>
+      <Form {...form}>
+        <form
+          className="flex flex-col gap-8 w-full"
+          onSubmit={form.handleSubmit(handleSubmit)}
+        >
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    label="E-mail"
+                    type="email"
+                    id="email"
+                    required
+                    placeholder="Digite seu e-mail"
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-      <form
-        className="flex flex-col gap-8 w-full"
-        onSubmit={form.handleSubmit(handleSubmit)}
-      >
-        <Input
-          label="E-mail"
-          type="email"
-          id="email"
-          size="lg"
-          fullWidth
-          required
-          placeholder="Digite seu e-mail"
-          {...form.register("email")}
-        />
-
-        <Input
-          label="Senha"
-          type="password"
-          id="password"
-          size="lg"
-          fullWidth
-          required
-          placeholder="Digite sua senha"
-          {...form.register("password")}
-        />
-
-        <Button variant="accent" size="lg" className="mt-2">
-          Acessar plataforma
-        </Button>
-      </form>
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    label="Senha"
+                    type="password"
+                    id="password"
+                    required
+                    placeholder="Digite sua senha"
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <Button variant="accent" size="lg" className="mt-2">
+            Acessar plataforma
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 };
