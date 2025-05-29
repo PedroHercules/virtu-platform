@@ -8,6 +8,8 @@ import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const loginSchema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -56,47 +58,34 @@ export const LoginForm: React.FC = () => {
       </div>
 
       <form
-        className="flex flex-col gap-10 w-full"
+        className="flex flex-col gap-8 w-full"
         onSubmit={form.handleSubmit(handleSubmit)}
       >
-        <div className="space-y-4">
-          <label
-            htmlFor="email"
-            className="block text-lg font-medium text-foreground/90"
-          >
-            E-mail
-          </label>
-          <input
-            type="email"
-            id="email"
-            required
-            placeholder="Digite seu e-mail"
-            className="block w-full px-6 py-4 bg-input/50 border border-accent/20 rounded-lg text-lg focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 text-foreground placeholder:text-foreground/40 transition-colors"
-            {...form.register("email")}
-          />
-        </div>
-        <div className="space-y-4">
-          <label
-            htmlFor="password"
-            className="block text-lg font-medium text-foreground/90"
-          >
-            Senha
-          </label>
-          <input
-            type="password"
-            id="password"
-            required
-            placeholder="Digite sua senha"
-            className="block w-full px-6 py-4 bg-input/50 border border-accent/20 rounded-lg text-lg focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 text-foreground placeholder:text-foreground/40 transition-colors"
-            {...form.register("password")}
-          />
-        </div>
-        <button
-          type="submit"
-          className="mt-6 w-full px-8 py-4 bg-accent hover:bg-accent-hover text-background font-medium rounded-lg text-xl transition-colors shadow-lg hover:shadow-xl"
-        >
-          Entrar
-        </button>
+        <Input
+          label="E-mail"
+          type="email"
+          id="email"
+          size="lg"
+          fullWidth
+          required
+          placeholder="Digite seu e-mail"
+          {...form.register("email")}
+        />
+
+        <Input
+          label="Senha"
+          type="password"
+          id="password"
+          size="lg"
+          fullWidth
+          required
+          placeholder="Digite sua senha"
+          {...form.register("password")}
+        />
+
+        <Button variant="primary" size="lg" className="mt-2">
+          Acessar plataforma
+        </Button>
       </form>
     </div>
   );
