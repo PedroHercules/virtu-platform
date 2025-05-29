@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -36,12 +37,13 @@ export const LoginForm: React.FC = () => {
         throw new Error(response.error);
       }
 
-      console.log("Login bem-sucedido:", response);
-
       router.push("/");
+
+      toast.success("Login realizado com sucesso!");
     } catch (error) {
-      console.error("Erro ao fazer login:", error);
-      // Aqui você pode adicionar lógica para lidar com erros, como exibir uma mensagem de erro
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao fazer login"
+      );
     }
   };
   return (

@@ -48,7 +48,9 @@ export const authOptions: NextAuthOptions = {
           return loginResponse;
         } catch (error) {
           console.error("Error during authorization:", error);
-          throw new Error("Login failed. Please try again.");
+          throw new Error(
+            error instanceof Error ? error.message : "Autenticação falhou"
+          );
         }
       },
     }),
