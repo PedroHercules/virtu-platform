@@ -1,6 +1,6 @@
 import * as React from "react";
 import Image from "next/image";
-import { LoginForm } from "./login-form";
+import { LoginForm } from "../../modules/login/login-form";
 
 export const LoginLayout: React.FC = () => {
   return (

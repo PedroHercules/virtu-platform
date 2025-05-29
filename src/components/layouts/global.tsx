@@ -1,7 +1,7 @@
 import { Sidebar } from "@/components/ui/sidebar";
 import * as React from "react";
 
-export const DashboardLayout: React.FC<React.PropsWithChildren> = ({
+export const GlobalLayout: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   return (
