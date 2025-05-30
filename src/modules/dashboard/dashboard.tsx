@@ -2,6 +2,13 @@ import * as React from "react";
 import { dashboardMockData } from "./mock/dashboard-data";
 import { Student, Plan } from "./types";
 import { InfoIcon } from "@/components/ui/tooltip";
+import {
+  Users,
+  DollarSign,
+  UserPlus,
+  CheckCircle,
+  TrendingUp,
+} from "lucide-react";
 
 export const Dashboard: React.FC = () => {
   const totalRevenue = dashboardMockData.recentStudents.reduce(
@@ -37,19 +44,7 @@ export const Dashboard: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-emerald-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
+                <Users className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -94,19 +89,7 @@ export const Dashboard: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                  />
-                </svg>
+                <DollarSign className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -147,19 +130,7 @@ export const Dashboard: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                  />
-                </svg>
+                <UserPlus className="w-5 h-5 text-purple-600" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -176,17 +147,7 @@ export const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between pt-2 border-t border-border/20">
               <span className="text-xs text-muted-foreground">Este mês</span>
               <div className="flex items-center gap-1">
-                <svg
-                  className="w-3 h-3 text-accent"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <TrendingUp className="w-3 h-3 text-accent" />
                 <span className="text-xs font-medium text-accent">+15%</span>
                 <InfoIcon tooltip="Crescimento de 15% em relação ao mês anterior" />
               </div>
@@ -199,19 +160,7 @@ export const Dashboard: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-amber-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <CheckCircle className="w-5 h-5 text-amber-600" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -251,50 +200,55 @@ export const Dashboard: React.FC = () => {
       {/* Conteúdo Principal */}
       <div className="grid grid-cols-4 gap-6 flex-1">
         {/* Planos Mais Procurados */}
-        <div className="bg-gradient-to-br from-background/80 via-background to-primary/50 rounded-2xl border border-border/30 backdrop-blur-sm shadow-xl overflow-hidden">
-          <div className="p-6 border-b border-border/30">
-            <h2 className="font-medium bg-gradient-to-r from-accent to-accent-foreground bg-clip-text text-transparent flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span>Planos Mais Procurados</span>
-                <InfoIcon tooltip="Ranking dos planos de mensalidade com maior número de alunos" />
+        <div className="p-6 bg-gradient-to-br from-background/80 via-background to-indigo-500/10 rounded-2xl border border-border/30 backdrop-blur-sm shadow-xl">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-indigo-600" />
               </div>
-              <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent">
-                Top {topPlans.length}
-              </span>
-            </h2>
-          </div>
-          <div className="py-3 px-4 grid gap-2">
-            {topPlans.map((plan, index) => (
-              <div
-                key={plan.id}
-                className="p-3 rounded-lg bg-gradient-to-r from-background/50 to-primary/10 border border-border/20"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
-                      <span className="text-xs font-bold text-accent">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    Planos Mais Procurados
+                  </span>
+                  <InfoIcon tooltip="Ranking dos planos de mensalidade com maior número de alunos" />
+                </div>
+                <h3 className="text-2xl font-bold text-indigo-600">
+                  Top {topPlans.length}
+                </h3>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {topPlans.map((plan, index) => (
+                <div
+                  key={plan.id}
+                  className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-background/80 to-indigo-500/5 border border-border/20 hover:bg-indigo-500/10 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500/20 to-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+                      <span className="text-sm font-bold text-indigo-600">
                         {index + 1}
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-medium text-sm">{plan.name}</h3>
-                      <div className="text-xs text-muted-foreground">
+                      <h4 className="font-semibold text-sm">{plan.name}</h4>
+                      <p className="text-xs text-muted-foreground">
                         {plan.monthlyFee.toLocaleString("pt-BR", {
                           style: "currency",
                           currency: "BRL",
                         })}
-                      </div>
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-bold text-accent">
+                    <div className="text-lg font-bold text-indigo-600">
                       {plan.studentsCount}
                     </div>
                     <div className="text-xs text-muted-foreground">alunos</div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
