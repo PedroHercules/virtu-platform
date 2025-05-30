@@ -1,91 +1,67 @@
-export interface Student {
-  id: string;
-  name: string;
-  email: string;
-  status: "active" | "inactive";
-  createdAt: string;
-  monthlyFee: number;
-}
-
-export interface Plan {
-  id: string;
-  name: string;
-  studentsCount: number;
-  monthlyFee: number;
-}
-
-export interface DashboardData {
-  totalStudents: number;
-  activeStudents: number;
-  inactiveStudents: number;
-  recentStudents: Student[];
-  plans: Plan[];
-}
+import { DashboardData } from "../types";
 
 export const dashboardMockData: DashboardData = {
-  totalStudents: 156,
-  activeStudents: 134,
-  inactiveStudents: 22,
-  plans: [
-    {
-      id: "1",
-      name: "Plano Basic",
-      studentsCount: 45,
-      monthlyFee: 299.9,
-    },
-    {
-      id: "2",
-      name: "Plano Standard",
-      studentsCount: 67,
-      monthlyFee: 399.9,
-    },
-    {
-      id: "3",
-      name: "Plano Premium",
-      studentsCount: 44,
-      monthlyFee: 499.9,
-    },
-  ],
+  activeStudents: 125,
+  inactiveStudents: 15,
+  totalStudents: 140,
   recentStudents: [
     {
       id: "1",
       name: "João Silva",
-      email: "joao@email.com",
+      email: "joao.silva@email.com",
+      monthlyFee: 150,
       status: "active",
-      createdAt: "2024-05-27T18:00:00Z",
-      monthlyFee: 499.9,
+      createdAt: "2025-05-28",
     },
     {
       id: "2",
       name: "Maria Santos",
-      email: "maria@email.com",
+      email: "maria.santos@email.com",
+      monthlyFee: 180,
       status: "active",
-      createdAt: "2024-05-27T17:30:00Z",
-      monthlyFee: 399.9,
+      createdAt: "2025-05-27",
     },
     {
       id: "3",
       name: "Pedro Oliveira",
-      email: "pedro@email.com",
+      email: "pedro.oliveira@email.com",
+      monthlyFee: 150,
       status: "inactive",
-      createdAt: "2024-05-27T17:00:00Z",
-      monthlyFee: 299.9,
+      createdAt: "2025-05-26",
     },
     {
       id: "4",
       name: "Ana Costa",
-      email: "ana@email.com",
+      email: "ana.costa@email.com",
+      monthlyFee: 180,
       status: "active",
-      createdAt: "2024-05-27T16:30:00Z",
-      monthlyFee: 449.9,
+      createdAt: "2025-05-25",
+    },
+  ],
+  plans: [
+    {
+      id: "1",
+      name: "Plano Mensal",
+      monthlyFee: 150,
+      studentsCount: 45,
     },
     {
-      id: "5",
-      name: "Lucas Ferreira",
-      email: "lucas@email.com",
-      status: "active",
-      createdAt: "2024-05-27T16:00:00Z",
-      monthlyFee: 349.9,
+      id: "2",
+      name: "Plano Trimestral",
+      monthlyFee: 130,
+      studentsCount: 35,
+    },
+    {
+      id: "3",
+      name: "Plano Semestral",
+      monthlyFee: 120,
+      studentsCount: 25,
+    },
+    {
+      id: "4",
+      name: "Plano Anual",
+      monthlyFee: 100,
+      studentsCount: 20,
     },
   ],
 };
