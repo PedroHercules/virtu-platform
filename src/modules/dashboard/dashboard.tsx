@@ -1,6 +1,7 @@
 import * as React from "react";
 import { dashboardMockData } from "./mock/dashboard-data";
 import { Student, Plan } from "./types";
+import { InfoIcon } from "@/components/ui/tooltip";
 
 export const Dashboard: React.FC = () => {
   const totalRevenue = dashboardMockData.recentStudents.reduce(
@@ -51,9 +52,11 @@ export const Dashboard: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <span className="text-sm text-muted-foreground">
-                  Alunos Matriculados
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    Alunos Matriculados
+                  </span>
+                </div>
                 <h3 className="text-2xl font-bold text-emerald-600">
                   {dashboardMockData.totalStudents}
                 </h3>
@@ -64,6 +67,7 @@ export const Dashboard: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-500" />
                   <span className="text-xs text-muted-foreground">Ativos</span>
+                  <InfoIcon tooltip="Alunos com mensalidade em dia e frequentando as aulas" />
                 </div>
                 <span className="text-sm font-semibold text-emerald-600">
                   {dashboardMockData.activeStudents}
@@ -75,6 +79,7 @@ export const Dashboard: React.FC = () => {
                   <span className="text-xs text-muted-foreground">
                     Inativos
                   </span>
+                  <InfoIcon tooltip="Alunos com matrícula suspensa ou inadimplentes" />
                 </div>
                 <span className="text-sm font-semibold text-orange-600">
                   {dashboardMockData.inactiveStudents}
@@ -104,9 +109,12 @@ export const Dashboard: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <span className="text-sm text-muted-foreground">
-                  Faturamento Mensal
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    Faturamento Mensal
+                  </span>
+                  <InfoIcon tooltip="Receita total gerada pelas mensalidades dos alunos ativos" />
+                </div>
                 <h3 className="text-2xl font-bold text-blue-600">
                   {totalRevenue.toLocaleString("pt-BR", {
                     style: "currency",
@@ -117,9 +125,12 @@ export const Dashboard: React.FC = () => {
             </div>
             <div className="pt-2 border-t border-border/20">
               <div className="flex justify-between items-center">
-                <span className="text-xs text-muted-foreground">
-                  Ticket médio
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    Ticket médio
+                  </span>
+                  <InfoIcon tooltip="Valor médio pago por aluno (faturamento total ÷ número de alunos)" />
+                </div>
                 <span className="text-sm font-semibold text-accent">
                   {averageRevenue.toLocaleString("pt-BR", {
                     style: "currency",
@@ -151,9 +162,12 @@ export const Dashboard: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <span className="text-sm text-muted-foreground">
-                  Novas Matrículas
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    Novas Matrículas
+                  </span>
+                  <InfoIcon tooltip="Número de novos alunos que se matricularam no período atual" />
+                </div>
                 <h3 className="text-2xl font-bold text-purple-600">
                   {recentStudents.length}
                 </h3>
@@ -174,6 +188,7 @@ export const Dashboard: React.FC = () => {
                   />
                 </svg>
                 <span className="text-xs font-medium text-accent">+15%</span>
+                <InfoIcon tooltip="Crescimento de 15% em relação ao mês anterior" />
               </div>
             </div>
           </div>
@@ -199,9 +214,12 @@ export const Dashboard: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <span className="text-sm text-muted-foreground">
-                  Taxa de Retenção
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    Taxa de Retenção
+                  </span>
+                  <InfoIcon tooltip="Percentual de alunos ativos em relação ao total de matriculados" />
+                </div>
                 <h3 className="text-2xl font-bold text-amber-600">
                   {activeStudentsPercentage.toFixed(1)}%
                 </h3>
@@ -215,7 +233,10 @@ export const Dashboard: React.FC = () => {
                 />
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Meta: 85%</span>
+                <div className="flex items-center gap-1">
+                  <span>Meta: 85%</span>
+                  <InfoIcon tooltip="Meta ideal de retenção para uma academia saudável" />
+                </div>
                 <span className="text-amber-600 font-medium">
                   {activeStudentsPercentage > 85
                     ? "Meta atingida!"
@@ -233,7 +254,10 @@ export const Dashboard: React.FC = () => {
         <div className="bg-gradient-to-br from-background/80 via-background to-primary/50 rounded-2xl border border-border/30 backdrop-blur-sm shadow-xl overflow-hidden">
           <div className="p-6 border-b border-border/30">
             <h2 className="font-medium bg-gradient-to-r from-accent to-accent-foreground bg-clip-text text-transparent flex items-center justify-between">
-              <span>Planos Mais Procurados</span>
+              <div className="flex items-center gap-2">
+                <span>Planos Mais Procurados</span>
+                <InfoIcon tooltip="Ranking dos planos de mensalidade com maior número de alunos" />
+              </div>
               <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent">
                 Top {topPlans.length}
               </span>
