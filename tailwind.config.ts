@@ -8,23 +8,24 @@ const config: Config = {
         sans: ["var(--font-inter)"],
       },
       colors: {
-        background: "#1E1E2E", // Azul escuro suave
+        background: "#182038", // Azul profundo base
         foreground: "#F2F2F2",
-        muted: "#282838", // Azul escuro um pouco mais claro
+        muted: "#1E1E3E", // Azul médio
         primary: {
-          DEFAULT: "#C41E3A", // Vermelho profundo
-          hover: "#A91B33",
+          DEFAULT: "#141438", // Azul escuro
+          hover: "#1a1a2e",
         },
         secondary: {
-          DEFAULT: "#2A2A3C", // Azul escuro mais claro
-          hover: "#313145",
+          DEFAULT: "#1E1E3E", // Azul médio
+          hover: "#232348",
         },
         accent: {
-          DEFAULT: "#D4AF37", // Dourado mais vibrante
+          DEFAULT: "#D4AF37", // Mantendo o dourado
           hover: "#BF9F30",
+          foreground: "#F2F2F2",
         },
-        border: "#373750", // Azul acinzentado
-        input: "#24243A", // Azul escuro para inputs
+        border: "#1E1E3E", // Azul médio para bordas
+        input: "#141438", // Azul escuro para inputs
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

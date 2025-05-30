@@ -1,5 +1,5 @@
-import { LoginLayout } from "@/components/layouts/login";
+import { LoginForm } from "@/modules/login/login-form";
 
 export default function LoginPage() {
-  return <LoginLayout />;
+  return <LoginForm />;
 }

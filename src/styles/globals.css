@@ -10,12 +10,91 @@
   --input: #24243A;
 }
 
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes water {
+  0%, 100% {
+    background-position: 0% 50%;
+    filter: brightness(1) saturate(1);
+  }
+  25% {
+    background-position: 25% 25%;
+    filter: brightness(1.05) saturate(1.05);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.1) saturate(1.1);
+  }
+  75% {
+    background-position: 75% 75%;
+    filter: brightness(1.05) saturate(1.05);
+  }
+}
+
+@keyframes water-shine {
+  0%, 100% {
+    opacity: 0.1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.15;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+.water-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.water-effect::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, transparent 30%, rgba(66,66,102,0.1) 70%);
+  animation: water-shine 8s ease-in-out infinite;
+}
+
+.animate-water {
+  animation: water 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  background-size: 400% 400%;
+}
+
+.animate-water-shine {
+  animation: water-shine 8s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-gradient {
+  animation: gradient 8s linear infinite;
+  background-size: 200% auto;
+}
+
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: var(--background);
   color: var(--foreground);
+  background-color: var(--background);
 }
 
 body * {
