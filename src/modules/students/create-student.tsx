@@ -11,8 +11,6 @@ import {
   Phone,
   CreditCard,
   CheckCircle,
-  AlertCircle,
-  Loader2,
   Award,
 } from "lucide-react";
 import {
@@ -28,6 +26,9 @@ import { plans } from "./mock/students-data";
 import { graduationsData } from "./mock/graduations-data";
 import { useRouter } from "next/navigation";
 import { studentsRoutes } from "@/routes/students";
+import { LoadingModal } from "@/components/ui/loading-modal";
+import { ErrorModal } from "@/components/ui/error-modal";
+import { StudentsSuccessModal } from "./components/success-modal";
 
 // Schema de validação atualizado
 const createStudentSchema = z.object({
@@ -43,10 +44,12 @@ type CreateStudentFormData = z.infer<typeof createStudentSchema>;
 export const CreateStudent = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [submitStatus, setSubmitStatus] = React.useState<{
-    type: "success" | "error" | null;
+  const [showSuccessModal, setShowSuccessModal] = React.useState(false);
+  const [errorModal, setErrorModal] = React.useState<{
+    open: boolean;
     message: string;
-  }>({ type: null, message: "" });
+    details?: string;
+  }>({ open: false, message: "", details: undefined });
 
   const form = useForm<CreateStudentFormData>({
     resolver: zodResolver(createStudentSchema),
@@ -89,36 +92,45 @@ export const CreateStudent = () => {
 
   const onSubmit = async (data: CreateStudentFormData) => {
     setIsSubmitting(true);
-    setSubmitStatus({ type: null, message: "" });
 
     try {
       // Simular chamada de API
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Simular erro aleatório para demonstração
-      if (Math.random() > 0.8) {
+      if (Math.random() > 0.7) {
         throw new Error("Email já está em uso por outro aluno");
       }
 
       console.log("Dados do aluno:", data);
 
-      setSubmitStatus({
-        type: "success",
-        message: "Aluno criado com sucesso! Redirecionando...",
-      });
-
-      // Redirecionar após sucesso
-      setTimeout(() => {
-        router.push(studentsRoutes.students);
-      }, 2000);
+      // Mostrar modal de sucesso
+      setShowSuccessModal(true);
     } catch (error) {
-      setSubmitStatus({
-        type: "error",
-        message: error instanceof Error ? error.message : "Erro ao criar aluno",
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao criar aluno";
+      setErrorModal({
+        open: true,
+        message: errorMessage,
+        details:
+          "Verifique os dados inseridos e tente novamente. Se o problema persistir, entre em contato com o suporte técnico.",
       });
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleRetrySubmit = () => {
+    setErrorModal({ open: false, message: "", details: undefined });
+    form.handleSubmit(onSubmit)();
+  };
+
+  const handleCloseErrorModal = () => {
+    setErrorModal({ open: false, message: "", details: undefined });
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
   };
 
   const handleBack = () => {
@@ -152,24 +164,6 @@ export const CreateStudent = () => {
         {/* Main Content - Full Width */}
         <div className="w-full">
           <div className="bg-gradient-to-br from-primary/50 via-background/95 to-secondary/30 backdrop-blur-sm border border-border/30 rounded-2xl shadow-xl shadow-accent/5 p-8">
-            {/* Status Messages */}
-            {submitStatus.type && (
-              <div
-                className={`mb-8 p-4 rounded-xl border flex items-center gap-3 ${
-                  submitStatus.type === "success"
-                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
-                    : "bg-red-500/10 border-red-500/20 text-red-600"
-                }`}
-              >
-                {submitStatus.type === "success" ? (
-                  <CheckCircle size={20} />
-                ) : (
-                  <AlertCircle size={20} />
-                )}
-                <span className="font-medium">{submitStatus.message}</span>
-              </div>
-            )}
-
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -330,17 +324,8 @@ export const CreateStudent = () => {
                     disabled={isSubmitting}
                     className="h-14 px-16 rounded-xl bg-gradient-to-r from-accent to-accent/90 hover:from-accent hover:to-accent text-primary font-bold shadow-lg shadow-accent/30 transition-all duration-200 hover:shadow-xl hover:shadow-accent/40 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-base"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 size={20} className="animate-spin" />
-                        Criando aluno...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle size={20} />
-                        Criar Aluno
-                      </>
-                    )}
+                    <CheckCircle size={20} />
+                    Criar Aluno
                   </button>
                 </div>
               </form>
@@ -348,6 +333,30 @@ export const CreateStudent = () => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <LoadingModal
+        open={isSubmitting}
+        title="Criando aluno..."
+        description="Estamos processando as informações do novo aluno. Isso pode levar alguns instantes."
+      />
+
+      <ErrorModal
+        open={errorModal.open}
+        title="Erro ao criar aluno"
+        message={errorModal.message}
+        details={errorModal.details}
+        onClose={handleCloseErrorModal}
+        onRetry={handleRetrySubmit}
+        showRetry={true}
+      />
+
+      <StudentsSuccessModal
+        open={showSuccessModal}
+        title="Aluno criado com sucesso!"
+        description={`O aluno ${form.getValues("name")} foi cadastrado com sucesso na academia.`}
+        onClose={handleCloseSuccessModal}
+      />
     </div>
   );
 };
