@@ -16,6 +16,8 @@ import {
   GraduationCap,
   Wallet,
   Crown,
+  Swords,
+  Trophy,
 } from "lucide-react";
 
 export const Sidebar = () => {
@@ -90,11 +92,15 @@ export const Sidebar = () => {
                   <span className="font-bold text-foreground/50 text-sm tracking-wide flex-1">
                     {item.name}
                   </span>
-                  {/* Rank indicator for disabled */}
-                  <div className="ml-auto flex flex-col gap-0.5">
-                    <div className="w-6 h-0.5 bg-foreground/20 rounded-full" />
-                    <div className="w-4 h-0.5 bg-foreground/20 rounded-full" />
-                    <div className="w-3 h-0.5 bg-foreground/20 rounded-full" />
+                  <div className="ml-auto flex items-center gap-1">
+                    <Swords
+                      size={16}
+                      className={`text-foreground/70 transition-all duration-500 ${
+                        pathname === item.path
+                          ? "text-yellow-500"
+                          : "group-hover:text-accent/80"
+                      }`}
+                    />
                   </div>
                 </div>
               ) : (
@@ -122,7 +128,7 @@ export const Sidebar = () => {
                       size={18}
                       className={`transition-all duration-500 ${
                         pathname === item.path
-                          ? "text-accent"
+                          ? "text-yellow-500"
                           : "text-foreground/80 group-hover:text-accent"
                       }`}
                     />
@@ -138,27 +144,13 @@ export const Sidebar = () => {
                     {item.name}
                   </span>
 
-                  {/* Rank visualization */}
-                  <div className="ml-auto flex flex-col gap-0.5">
-                    <div
-                      className={`h-0.5 rounded-full transition-all duration-300 ${
+                  <div className="ml-auto flex items-center gap-1">
+                    <Swords
+                      size={16}
+                      className={`text-foreground/70 transition-all duration-500 ${
                         pathname === item.path
-                          ? "w-6 bg-accent"
-                          : "w-5 bg-foreground/30 group-hover:bg-accent/60 group-hover:w-6"
-                      }`}
-                    />
-                    <div
-                      className={`h-0.5 rounded-full transition-all duration-300 delay-75 ${
-                        pathname === item.path
-                          ? "w-4 bg-accent/80"
-                          : "w-3 bg-foreground/20 group-hover:bg-accent/40 group-hover:w-4"
-                      }`}
-                    />
-                    <div
-                      className={`h-0.5 rounded-full transition-all duration-300 delay-150 ${
-                        pathname === item.path
-                          ? "w-3 bg-accent/60"
-                          : "w-2 bg-foreground/10 group-hover:bg-accent/20 group-hover:w-3"
+                          ? "text-yellow-500"
+                          : "group-hover:text-accent/80"
                       }`}
                     />
                   </div>
@@ -180,7 +172,7 @@ export const Sidebar = () => {
 
               {/* Professor rank indicators */}
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full border-2 border-primary flex items-center justify-center">
-                <span className="text-xs text-primary font-bold">★</span>
+                <Trophy size={10} className="text-primary" />
               </div>
             </div>
 
