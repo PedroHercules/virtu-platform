@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { PlusCircle, Search } from "lucide-react";
+import { PlusCircle, Search, CheckCircle, XCircle, Trash } from "lucide-react";
 import { plans, studentsData } from "./mock/students-data";
 import {
   Select,
@@ -94,7 +94,7 @@ export const Students = () => {
         <h1 className="text-2xl font-bold bg-gradient-to-r from-accent to-accent-foreground bg-clip-text text-transparent">
           Alunos
         </h1>
-        <button className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-foreground px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 backdrop-blur-sm">
+        <button className="inline-flex items-center gap-2 rounded-xl bg-accent border border-border px-6 py-3 text-sm font-semibold text-background hover:bg-accent-hover shadow-lg transition-all duration-200 hover:shadow-xl backdrop-blur-sm">
           <PlusCircle size={18} />
           Novo Aluno
         </button>
@@ -153,21 +153,24 @@ export const Students = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleUpdateStatusBatch("active")}
-              className="rounded-lg bg-emerald-500 px-3 py-1.5 text-sm font-medium text-white transition-all duration-200 hover:bg-emerald-600 hover:shadow-md"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary border border-border hover:bg-primary-hover text-foreground hover:text-accent transition-all duration-200 shadow-sm hover:shadow-md"
+              title="Ativar selecionados"
             >
-              Ativar
+              <CheckCircle size={16} />
             </button>
             <button
               onClick={() => handleUpdateStatusBatch("inactive")}
-              className="rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white transition-all duration-200 hover:bg-orange-600 hover:shadow-md"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-secondary border border-border hover:bg-secondary-hover text-foreground hover:text-accent transition-all duration-200 shadow-sm hover:shadow-md"
+              title="Inativar selecionados"
             >
-              Inativar
+              <XCircle size={16} />
             </button>
             <button
               onClick={handleDeleteSelected}
-              className="rounded-lg bg-red-500 px-3 py-1.5 text-sm font-medium text-white transition-all duration-200 hover:bg-red-600 hover:shadow-md"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-muted border border-border hover:bg-accent/20 text-foreground hover:text-accent transition-all duration-200 shadow-sm hover:shadow-md"
+              title="Excluir selecionados"
             >
-              Excluir
+              <Trash size={16} />
             </button>
           </div>
         </div>
