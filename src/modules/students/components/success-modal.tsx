@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CheckCircle2, Users, UserPlus, ArrowRight } from "lucide-react";
+import { CheckCircle2, Users, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
