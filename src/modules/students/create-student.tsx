@@ -1,0 +1,353 @@
+"use client";
+
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Phone,
+  CreditCard,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  Award,
+} from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import SelectInput from "@/components/ui/select-input";
+import { plans } from "./mock/students-data";
+import { graduationsData } from "./mock/graduations-data";
+import { useRouter } from "next/navigation";
+import { studentsRoutes } from "@/routes/students";
+
+// Schema de validação atualizado
+const createStudentSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+  email: z.string().email("Digite um email válido"),
+  phone: z.string().optional(),
+  planId: z.string().optional(),
+  graduationId: z.string().optional(),
+});
+
+type CreateStudentFormData = z.infer<typeof createStudentSchema>;
+
+export const CreateStudent = () => {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submitStatus, setSubmitStatus] = React.useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
+
+  const form = useForm<CreateStudentFormData>({
+    resolver: zodResolver(createStudentSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      planId: undefined,
+      graduationId: undefined,
+    },
+  });
+
+  // Opções de planos com informações detalhadas
+  const planOptions = plans.map((plan) => ({
+    value: plan.id,
+    label: `${plan.name} - R$ ${plan.monthlyFee.toFixed(2)}/mês`,
+  }));
+
+  // Opções de graduações ordenadas por nível
+  const graduationOptions = graduationsData
+    .sort((a, b) => a.level - b.level)
+    .map((graduation) => ({
+      value: graduation.id,
+      label: `${graduation.name} (Nível ${graduation.level})`,
+    }));
+
+  // Função para formatar telefone durante a digitação
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 10) {
+      return numbers
+        .replace(/(\d{2})(\d)/, "($1) $2")
+        .replace(/(\d{4})(\d)/, "$1-$2");
+    } else {
+      return numbers
+        .replace(/(\d{2})(\d)/, "($1) $2")
+        .replace(/(\d{5})(\d)/, "$1-$2");
+    }
+  };
+
+  const onSubmit = async (data: CreateStudentFormData) => {
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: "" });
+
+    try {
+      // Simular chamada de API
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Simular erro aleatório para demonstração
+      if (Math.random() > 0.8) {
+        throw new Error("Email já está em uso por outro aluno");
+      }
+
+      console.log("Dados do aluno:", data);
+
+      setSubmitStatus({
+        type: "success",
+        message: "Aluno criado com sucesso! Redirecionando...",
+      });
+
+      // Redirecionar após sucesso
+      setTimeout(() => {
+        router.push(studentsRoutes.students);
+      }, 2000);
+    } catch (error) {
+      setSubmitStatus({
+        type: "error",
+        message: error instanceof Error ? error.message : "Erro ao criar aluno",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBack = () => {
+    router.push(studentsRoutes.students);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 p-6">
+      <div className="container mx-auto h-full">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <button
+            onClick={handleBack}
+            className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-secondary/80 to-secondary/60 border border-border/30 hover:from-secondary hover:to-secondary/80 transition-all duration-200 hover:shadow-lg group"
+          >
+            <ArrowLeft
+              size={20}
+              className="text-foreground/80 group-hover:text-accent transition-colors"
+            />
+          </button>
+          <div>
+            <h1 className="text-3xl font-black bg-gradient-to-r from-accent via-accent/90 to-accent/70 bg-clip-text text-transparent">
+              Novo Aluno
+            </h1>
+            <p className="text-foreground/60 font-medium">
+              Cadastre um novo aluno na academia
+            </p>
+          </div>
+        </div>
+
+        {/* Main Content - Full Width */}
+        <div className="w-full">
+          <div className="bg-gradient-to-br from-primary/50 via-background/95 to-secondary/30 backdrop-blur-sm border border-border/30 rounded-2xl shadow-xl shadow-accent/5 p-8">
+            {/* Status Messages */}
+            {submitStatus.type && (
+              <div
+                className={`mb-8 p-4 rounded-xl border flex items-center gap-3 ${
+                  submitStatus.type === "success"
+                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
+                    : "bg-red-500/10 border-red-500/20 text-red-600"
+                }`}
+              >
+                {submitStatus.type === "success" ? (
+                  <CheckCircle size={20} />
+                ) : (
+                  <AlertCircle size={20} />
+                )}
+                <span className="font-medium">{submitStatus.message}</span>
+              </div>
+            )}
+
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
+                {/* Primeira linha: Nome e Email */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Nome */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground font-semibold flex items-center gap-2 text-base">
+                            <User size={18} className="text-accent" />
+                            Nome Completo *
+                          </FormLabel>
+                          <FormControl>
+                            <input
+                              {...field}
+                              placeholder="Digite o nome completo do aluno"
+                              className="h-14 w-full rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground font-semibold flex items-center gap-2 text-base">
+                            <Mail size={18} className="text-accent" />
+                            Email *
+                          </FormLabel>
+                          <FormControl>
+                            <input
+                              {...field}
+                              type="email"
+                              placeholder="Digite o email do aluno"
+                              className="h-14 w-full rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Segunda linha: Telefone, Plano e Graduação */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Telefone */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground font-semibold flex items-center gap-2 text-base">
+                            <Phone size={18} className="text-accent" />
+                            Telefone
+                          </FormLabel>
+                          <FormControl>
+                            <input
+                              {...field}
+                              placeholder="(11) 99999-9999"
+                              maxLength={15}
+                              onChange={(e) => {
+                                const formatted = formatPhone(e.target.value);
+                                field.onChange(formatted);
+                              }}
+                              className="h-14 w-full rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Plano */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="planId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground font-semibold flex items-center gap-2 text-base">
+                            <CreditCard size={18} className="text-accent" />
+                            Plano
+                          </FormLabel>
+                          <FormControl>
+                            <SelectInput
+                              value={field.value || ""}
+                              onValueChange={(value) => {
+                                field.onChange(value || undefined);
+                              }}
+                              options={planOptions}
+                              placeholder="Selecione o plano (opcional)"
+                              size="lg"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Graduação */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="graduationId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground font-semibold flex items-center gap-2 text-base">
+                            <Award size={18} className="text-accent" />
+                            Graduação
+                          </FormLabel>
+                          <FormControl>
+                            <SelectInput
+                              value={field.value || ""}
+                              onValueChange={(value) => {
+                                field.onChange(value || undefined);
+                              }}
+                              options={graduationOptions}
+                              placeholder="Selecione a graduação (opcional)"
+                              size="lg"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Buttons - Full Width */}
+                <div className="flex justify-between pt-8">
+                  <button
+                    type="button"
+                    onClick={handleBack}
+                    className="h-14 px-16 rounded-xl border border-border bg-secondary-hover hover:bg-background/80 text-foreground font-semibold transition-all duration-200 hover:shadow-md text-base"
+                    disabled={isSubmitting}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="h-14 px-16 rounded-xl bg-gradient-to-r from-accent to-accent/90 hover:from-accent hover:to-accent text-primary font-bold shadow-lg shadow-accent/30 transition-all duration-200 hover:shadow-xl hover:shadow-accent/40 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-base"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 size={20} className="animate-spin" />
+                        Criando aluno...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle size={20} />
+                        Criar Aluno
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

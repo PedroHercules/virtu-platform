@@ -17,7 +17,7 @@ type FiltersFormData = {
   planFilter: string;
 };
 
-export const Students = () => {
+export const Students: React.FC = () => {
   const router = useRouter();
 
   const filtersForm = useForm<FiltersFormData>({
@@ -116,7 +116,10 @@ export const Students = () => {
         <h1 className="text-2xl font-bold bg-gradient-to-r from-accent to-accent-foreground bg-clip-text text-transparent">
           Alunos
         </h1>
-        <button className="inline-flex items-center gap-2 rounded-xl bg-accent border border-border px-6 py-3 text-sm font-semibold text-background hover:bg-accent-hover shadow-lg transition-all duration-200 hover:shadow-xl backdrop-blur-sm">
+        <button
+          onClick={() => router.push(studentsRoutes.studentsCreate)}
+          className="inline-flex items-center gap-2 rounded-xl bg-accent border border-border px-6 py-3 text-sm font-semibold text-background hover:bg-accent-hover shadow-lg transition-all duration-200 hover:shadow-xl backdrop-blur-sm"
+        >
           <PlusCircle size={18} />
           Novo Aluno
         </button>
