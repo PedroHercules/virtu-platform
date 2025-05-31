@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumn } from "@/components/ui/data-table";
-import { homeRoutes } from "@/routes/home";
+import { studentsRoutes } from "@/routes/students";
 import { useRouter } from "next/navigation";
 import { Student } from "../mock/students-data";
 
@@ -114,7 +114,7 @@ export const useStudentsColumns = ({
               className="gap-2"
               onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
-                router.push(homeRoutes.studentsDetails(student.id));
+                router.push(studentsRoutes.studentsDetails(student.id));
               }}
             >
               <Eye size={16} />

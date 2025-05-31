@@ -13,7 +13,7 @@ import {
 import { DataTable } from "@/components/ui/data-table";
 import { useStudentsColumns } from "./components/columns";
 import { Student } from "./mock/students-data";
-import { homeRoutes } from "@/routes/home";
+import { studentsRoutes } from "@/routes/students";
 import { useRouter } from "next/navigation";
 
 export const Students = () => {
@@ -182,7 +182,7 @@ export const Students = () => {
         data={filteredStudents}
         columns={columns}
         onRowClick={(student) =>
-          router.push(homeRoutes.studentsDetails(student.id))
+          router.push(studentsRoutes.studentsDetails(student.id))
         }
         pagination={{
           enabled: true,

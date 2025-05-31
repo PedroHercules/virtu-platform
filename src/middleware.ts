@@ -1,7 +1,7 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { homeRoutes } from "./routes/home";
+import { dashboardRoutes } from "./routes/dashboard";
 import { authRoutes } from "./routes/auth";
 import { COOKIES } from "./utils/cookies";
 
@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
         !isTokenExpired(token.expiresIn as number)
       ) {
         return NextResponse.redirect(
-          new URL(homeRoutes.dashboard, request.url)
+          new URL(dashboardRoutes.dashboard, request.url)
         );
       }
       // Se não tiver token ou token expirado, permite acessar o login
@@ -58,7 +58,9 @@ export async function middleware(request: NextRequest) {
 
     // Redirecionar rota raiz para dashboard
     if (request.nextUrl.pathname === "/") {
-      return NextResponse.redirect(new URL(homeRoutes.dashboard, request.url));
+      return NextResponse.redirect(
+        new URL(dashboardRoutes.dashboard, request.url)
+      );
     }
 
     return NextResponse.next();

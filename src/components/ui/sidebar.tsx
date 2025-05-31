@@ -1,6 +1,11 @@
 "use client";
 
-import { homeRoutes } from "@/routes/home";
+import {
+  dashboardRoutes,
+  studentsRoutes,
+  graduationsRoutes,
+  paymentsRoutes,
+} from "@/routes";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,20 +25,25 @@ export const Sidebar = () => {
   const menuItems = [
     {
       name: "Dashboard",
-      path: homeRoutes.dashboard,
+      path: dashboardRoutes.dashboard,
       icon: LayoutDashboard,
       disabled: false,
     },
-    { name: "Alunos", path: homeRoutes.students, icon: Users, disabled: false },
+    {
+      name: "Alunos",
+      path: studentsRoutes.students,
+      icon: Users,
+      disabled: false,
+    },
     {
       name: "Graduações",
-      path: homeRoutes.graduations,
+      path: graduationsRoutes.graduations,
       icon: GraduationCap,
       disabled: true,
     },
     {
       name: "Pagamentos",
-      path: homeRoutes.payments,
+      path: paymentsRoutes.payments,
       icon: Wallet,
       disabled: true,
     },
