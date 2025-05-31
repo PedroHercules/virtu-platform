@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NextAuthProvider } from "@/components/providers/next-auth.provider";
 import { Toaster } from "@/components/ui/toast";
+import { NProgress } from "@/components/ui/nprogress";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <NextAuthProvider>
           {children}
+          <NProgress />
           <Toaster />
         </NextAuthProvider>
       </body>
