@@ -12,20 +12,7 @@ import {
 import { DataTableColumn } from "@/components/ui/data-table";
 import { homeRoutes } from "@/routes/home";
 import { useRouter } from "next/navigation";
-
-// Tipo do estudante
-export interface Student {
-  id: string;
-  name: string;
-  email: string;
-  document: string;
-  plan: {
-    id: string;
-    name: string;
-  };
-  status: "active" | "inactive";
-  createdAt: string;
-}
+import { Student } from "../mock/students-data";
 
 // Props para as ações das colunas
 interface ColumnActionsProps {
@@ -59,12 +46,16 @@ export const useStudentsColumns = ({
       key: "email",
       title: "Email",
       sortable: true,
-      render: (value) => <span className="text-muted-foreground">{value}</span>,
+      render: (value) => (
+        <span className="text-muted-foreground">{String(value)}</span>
+      ),
     },
     {
       key: "document",
       title: "Documento",
-      render: (value) => <span className="text-muted-foreground">{value}</span>,
+      render: (value) => (
+        <span className="text-muted-foreground">{String(value)}</span>
+      ),
     },
     {
       key: "plan",
@@ -96,7 +87,7 @@ export const useStudentsColumns = ({
       sortable: true,
       render: (value) => (
         <span className="text-muted-foreground">
-          {new Date(value).toLocaleDateString("pt-BR", {
+          {new Date(String(value)).toLocaleDateString("pt-BR", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
@@ -105,7 +96,7 @@ export const useStudentsColumns = ({
       ),
     },
     {
-      key: "actions",
+      key: "actions" as keyof Student,
       title: "",
       width: 48,
       render: (_, student) => (
@@ -173,3 +164,6 @@ export const useStudentsColumns = ({
     },
   ];
 };
+
+// Re-exportar o tipo Student do mock para facilitar importações
+export type { Student } from "../mock/students-data";

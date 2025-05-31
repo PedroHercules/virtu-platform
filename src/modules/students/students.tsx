@@ -11,7 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DataTable } from "@/components/ui/data-table";
-import { useStudentsColumns, Student } from "./components/columns";
+import { useStudentsColumns } from "./components/columns";
+import { Student } from "./mock/students-data";
 import { homeRoutes } from "@/routes/home";
 import { useRouter } from "next/navigation";
 
@@ -185,6 +186,7 @@ export const Students = () => {
         }
         pagination={{
           enabled: true,
+          type: "local",
           pageSize: 10,
           pageSizeOptions: [5, 10, 20, 50],
           showTotal: true,

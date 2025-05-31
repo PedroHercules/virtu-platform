@@ -25,23 +25,41 @@ import {
 
 // Tipos para as colunas
 export interface DataTableColumn<T> {
-  key: string;
+  key: keyof T;
   title: string;
-  render?: (value: any, item: T, index: number) => React.ReactNode;
+  render?: (value: T[keyof T], item: T, index: number) => React.ReactNode;
   sortable?: boolean;
   width?: string | number;
   align?: "left" | "center" | "right";
   className?: string;
 }
 
-// Configuração de paginação
-export interface PaginationConfig {
+// Configuração de paginação (local)
+export interface LocalPaginationConfig {
   enabled: boolean;
+  type: "local";
   pageSize?: number;
   pageSizeOptions?: number[];
   showTotal?: boolean;
   showPageSizeSelector?: boolean;
 }
+
+// Configuração de paginação (server-side)
+export interface ServerPaginationConfig {
+  enabled: boolean;
+  type: "server";
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  pageSizeOptions?: number[];
+  showTotal?: boolean;
+  showPageSizeSelector?: boolean;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
+}
+
+export type PaginationConfig = LocalPaginationConfig | ServerPaginationConfig;
 
 // Configuração de seleção
 export interface SelectionConfig<T> {
@@ -49,6 +67,18 @@ export interface SelectionConfig<T> {
   selectedItems?: T[];
   onSelectionChange?: (selectedItems: T[]) => void;
   getItemId: (item: T) => string | number;
+}
+
+// Configuração de ordenação (server-side)
+export interface SortConfig<T = Record<string, unknown>> {
+  key: keyof T;
+  direction: "asc" | "desc";
+}
+
+export interface ServerSortConfig<T = Record<string, unknown>> {
+  enabled: boolean;
+  currentSort?: SortConfig<T>;
+  onSortChange?: (sort: SortConfig<T> | null) => void;
 }
 
 // Props principais do DataTable
@@ -60,84 +90,170 @@ export interface DataTableProps<T> {
   onRowClick?: (item: T, index: number) => void;
   pagination?: PaginationConfig;
   selection?: SelectionConfig<T>;
+  serverSort?: ServerSortConfig<T>;
   className?: string;
   rowClassName?: string | ((item: T, index: number) => string);
 }
 
-export function DataTable<T>({
+export function DataTable<T extends Record<string, unknown>>({
   data,
   columns,
   loading = false,
   emptyMessage = "Nenhum item encontrado",
   onRowClick,
-  pagination = { enabled: false },
+  pagination = { enabled: false, type: "local" },
   selection,
+  serverSort,
   className,
   rowClassName,
 }: DataTableProps<T>) {
-  // Estados internos
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [pageSize, setPageSize] = React.useState(pagination.pageSize || 10);
-  const [sortConfig, setSortConfig] = React.useState<{
-    key: string;
-    direction: "asc" | "desc";
-  } | null>(null);
+  // Estados internos para paginação local
+  const [localCurrentPage, setLocalCurrentPage] = React.useState(1);
+  const [localPageSize, setLocalPageSize] = React.useState(
+    pagination.enabled && pagination.type === "local"
+      ? pagination.pageSize || 10
+      : 10
+  );
+  const [localSortConfig, setLocalSortConfig] =
+    React.useState<SortConfig<T> | null>(null);
 
-  // Dados processados (ordenação e filtros)
+  // Determinar se estamos usando paginação local ou server-side
+  const isServerPagination = pagination.enabled && pagination.type === "server";
+  const isLocalPagination = pagination.enabled && pagination.type === "local";
+
+  // Dados processados (apenas para paginação local)
   const processedData = React.useMemo(() => {
-    let result = [...data];
+    if (isServerPagination) return data; // Para server-side, os dados já vêm processados da API
 
-    // Aplicar ordenação
-    if (sortConfig) {
+    const result = [...data];
+
+    // Aplicar ordenação local
+    if (localSortConfig && !serverSort?.enabled) {
       result.sort((a, b) => {
-        const aValue = (a as any)[sortConfig.key];
-        const bValue = (b as any)[sortConfig.key];
+        const aValue = a[localSortConfig.key];
+        const bValue = b[localSortConfig.key];
 
         if (aValue < bValue) {
-          return sortConfig.direction === "asc" ? -1 : 1;
+          return localSortConfig.direction === "asc" ? -1 : 1;
         }
         if (aValue > bValue) {
-          return sortConfig.direction === "asc" ? 1 : -1;
+          return localSortConfig.direction === "asc" ? 1 : -1;
         }
         return 0;
       });
     }
 
     return result;
-  }, [data, sortConfig]);
+  }, [data, localSortConfig, isServerPagination, serverSort?.enabled]);
 
-  // Dados paginados
+  // Dados paginados (apenas para paginação local)
   const paginatedData = React.useMemo(() => {
-    if (!pagination.enabled) return processedData;
+    if (isServerPagination) return data; // Para server-side, os dados já vêm paginados da API
+    if (!isLocalPagination) return processedData;
 
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
+    const startIndex = (localCurrentPage - 1) * localPageSize;
+    const endIndex = startIndex + localPageSize;
     return processedData.slice(startIndex, endIndex);
-  }, [processedData, currentPage, pageSize, pagination.enabled]);
+  }, [
+    processedData,
+    localCurrentPage,
+    localPageSize,
+    isLocalPagination,
+    isServerPagination,
+    data,
+  ]);
 
   // Cálculos de paginação
-  const totalItems = processedData.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const startItem = (currentPage - 1) * pageSize + 1;
-  const endItem = Math.min(currentPage * pageSize, totalItems);
+  const paginationInfo = React.useMemo(() => {
+    if (isServerPagination) {
+      const serverConfig = pagination as ServerPaginationConfig;
+      return {
+        currentPage: serverConfig.currentPage,
+        pageSize: serverConfig.pageSize,
+        totalItems: serverConfig.totalItems,
+        totalPages: serverConfig.totalPages,
+        startItem: (serverConfig.currentPage - 1) * serverConfig.pageSize + 1,
+        endItem: Math.min(
+          serverConfig.currentPage * serverConfig.pageSize,
+          serverConfig.totalItems
+        ),
+      };
+    } else if (isLocalPagination) {
+      const totalItems = processedData.length;
+      const totalPages = Math.ceil(totalItems / localPageSize);
+      return {
+        currentPage: localCurrentPage,
+        pageSize: localPageSize,
+        totalItems,
+        totalPages,
+        startItem: (localCurrentPage - 1) * localPageSize + 1,
+        endItem: Math.min(localCurrentPage * localPageSize, totalItems),
+      };
+    }
+    return null;
+  }, [
+    isServerPagination,
+    isLocalPagination,
+    pagination,
+    processedData.length,
+    localCurrentPage,
+    localPageSize,
+  ]);
 
   // Handlers
-  const handleSort = (key: string) => {
+  const handleSort = (key: keyof T) => {
     const column = columns.find((col) => col.key === key);
     if (!column?.sortable) return;
 
-    setSortConfig((prevSort) => {
-      if (prevSort?.key === key) {
-        return prevSort.direction === "asc" ? { key, direction: "desc" } : null;
+    if (serverSort?.enabled && serverSort.onSortChange) {
+      // Ordenação server-side
+      const currentSort = serverSort.currentSort;
+      if (currentSort?.key === key) {
+        const newSort =
+          currentSort.direction === "asc"
+            ? { key, direction: "desc" as const }
+            : null;
+        serverSort.onSortChange(newSort);
+      } else {
+        serverSort.onSortChange({ key, direction: "asc" });
       }
-      return { key, direction: "asc" };
-    });
+    } else {
+      // Ordenação local
+      setLocalSortConfig((prevSort) => {
+        if (prevSort?.key === key) {
+          return prevSort.direction === "asc"
+            ? { key, direction: "desc" }
+            : null;
+        }
+        return { key, direction: "asc" };
+      });
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (isServerPagination) {
+      const serverConfig = pagination as ServerPaginationConfig;
+      serverConfig.onPageChange(newPage);
+    } else {
+      setLocalCurrentPage(newPage);
+    }
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    if (isServerPagination) {
+      const serverConfig = pagination as ServerPaginationConfig;
+      serverConfig.onPageSizeChange(newPageSize);
+    } else {
+      setLocalPageSize(newPageSize);
+      setLocalCurrentPage(1);
+    }
   };
 
   const handleSelectAll = () => {
     if (!selection?.enabled || !selection.onSelectionChange) return;
 
-    const allIds = paginatedData.map((item) => selection.getItemId(item));
+    const currentData = isServerPagination ? data : paginatedData;
+    const allIds = currentData.map((item) => selection.getItemId(item));
     const selectedIds =
       selection.selectedItems?.map((item) => selection.getItemId(item)) || [];
     const isAllSelected = allIds.every((id) => selectedIds.includes(id));
@@ -151,7 +267,7 @@ export function DataTable<T>({
       selection.onSelectionChange(newSelection);
     } else {
       // Selecionar todos da página atual
-      const currentPageItems = paginatedData.filter(
+      const currentPageItems = currentData.filter(
         (item) => !selectedIds.includes(selection.getItemId(item))
       );
       selection.onSelectionChange([
@@ -190,7 +306,8 @@ export function DataTable<T>({
 
   const isAllPageSelected = () => {
     if (!selection?.enabled || !selection.selectedItems) return false;
-    const allIds = paginatedData.map((item) => selection.getItemId(item));
+    const currentData = isServerPagination ? data : paginatedData;
+    const allIds = currentData.map((item) => selection.getItemId(item));
     const selectedIds = selection.selectedItems.map((item) =>
       selection.getItemId(item)
     );
@@ -204,9 +321,9 @@ export function DataTable<T>({
     index: number
   ) => {
     if (column.render) {
-      return column.render((item as any)[column.key], item, index);
+      return column.render(item[column.key], item, index);
     }
-    return (item as any)[column.key];
+    return item[column.key] as React.ReactNode;
   };
 
   // Classe da linha
@@ -217,6 +334,14 @@ export function DataTable<T>({
     }
     return `${baseClass} ${rowClassName || ""}`;
   };
+
+  // Determinar qual configuração de ordenação usar
+  const currentSortConfig = serverSort?.enabled
+    ? serverSort.currentSort
+    : localSortConfig;
+
+  // Dados para renderização
+  const displayData = isServerPagination ? data : paginatedData;
 
   return (
     <div className={`space-y-4 ${className || ""}`}>
@@ -235,7 +360,7 @@ export function DataTable<T>({
             )}
             {columns.map((column) => (
               <TableHead
-                key={column.key}
+                key={String(column.key)}
                 className={`${column.className || ""} ${
                   column.sortable ? "cursor-pointer hover:bg-primary/5" : ""
                 } ${column.align === "center" ? "text-center" : ""} ${
@@ -246,9 +371,9 @@ export function DataTable<T>({
               >
                 <div className="flex items-center gap-1">
                   {column.title}
-                  {column.sortable && sortConfig?.key === column.key && (
+                  {column.sortable && currentSortConfig?.key === column.key && (
                     <span className="text-accent">
-                      {sortConfig.direction === "asc" ? "↑" : "↓"}
+                      {currentSortConfig.direction === "asc" ? "↑" : "↓"}
                     </span>
                   )}
                 </div>
@@ -269,7 +394,7 @@ export function DataTable<T>({
                 </div>
               </TableCell>
             </TableRow>
-          ) : paginatedData.length === 0 ? (
+          ) : displayData.length === 0 ? (
             <TableRow>
               <TableCell
                 colSpan={columns.length + (selection?.enabled ? 1 : 0)}
@@ -279,7 +404,7 @@ export function DataTable<T>({
               </TableCell>
             </TableRow>
           ) : (
-            paginatedData.map((item, index) => (
+            displayData.map((item, index) => (
               <TableRow
                 key={selection?.enabled ? selection.getItemId(item) : index}
                 className={getRowClassName(item, index)}
@@ -299,7 +424,7 @@ export function DataTable<T>({
                 )}
                 {columns.map((column) => (
                   <TableCell
-                    key={column.key}
+                    key={String(column.key)}
                     className={`${column.className || ""} ${
                       column.align === "center" ? "text-center" : ""
                     } ${column.align === "right" ? "text-right" : ""}`}
@@ -314,77 +439,89 @@ export function DataTable<T>({
       </Table>
 
       {/* Paginação */}
-      {pagination.enabled && totalPages > 1 && (
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center space-x-6 lg:space-x-8">
-            {pagination.showPageSizeSelector && (
-              <div className="flex items-center space-x-2">
-                <p className="text-sm font-medium">Itens por página</p>
-                <Select
-                  value={pageSize.toString()}
-                  onValueChange={(value) => {
-                    setPageSize(Number(value));
-                    setCurrentPage(1);
-                  }}
+      {pagination.enabled &&
+        paginationInfo &&
+        paginationInfo.totalPages > 1 && (
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center space-x-6 lg:space-x-8">
+              {pagination.showPageSizeSelector && (
+                <div className="flex items-center space-x-2">
+                  <p className="text-sm font-medium">Itens por página</p>
+                  <Select
+                    value={paginationInfo.pageSize.toString()}
+                    onValueChange={(value) =>
+                      handlePageSizeChange(Number(value))
+                    }
+                  >
+                    <SelectTrigger className="h-8 w-[70px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent side="top">
+                      {(pagination.pageSizeOptions || [10, 20, 30, 40, 50]).map(
+                        (size) => (
+                          <SelectItem key={size} value={size.toString()}>
+                            {size}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {pagination.showTotal && (
+                <div className="text-sm text-muted-foreground">
+                  Mostrando {paginationInfo.startItem} a{" "}
+                  {paginationInfo.endItem} de {paginationInfo.totalItems}{" "}
+                  resultados
+                </div>
+              )}
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="text-sm font-medium">
+                Página {paginationInfo.currentPage} de{" "}
+                {paginationInfo.totalPages}
+              </div>
+              <div className="flex items-center space-x-1">
+                <button
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
+                  onClick={() => handlePageChange(1)}
+                  disabled={paginationInfo.currentPage === 1}
                 >
-                  <SelectTrigger className="h-8 w-[70px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent side="top">
-                    {(pagination.pageSizeOptions || [10, 20, 30, 40, 50]).map(
-                      (size) => (
-                        <SelectItem key={size} value={size.toString()}>
-                          {size}
-                        </SelectItem>
-                      )
-                    )}
-                  </SelectContent>
-                </Select>
+                  <ChevronsLeft className="h-4 w-4" />
+                </button>
+                <button
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
+                  onClick={() =>
+                    handlePageChange(paginationInfo.currentPage - 1)
+                  }
+                  disabled={paginationInfo.currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
+                  onClick={() =>
+                    handlePageChange(paginationInfo.currentPage + 1)
+                  }
+                  disabled={
+                    paginationInfo.currentPage === paginationInfo.totalPages
+                  }
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+                <button
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
+                  onClick={() => handlePageChange(paginationInfo.totalPages)}
+                  disabled={
+                    paginationInfo.currentPage === paginationInfo.totalPages
+                  }
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </button>
               </div>
-            )}
-            {pagination.showTotal && (
-              <div className="text-sm text-muted-foreground">
-                Mostrando {startItem} a {endItem} de {totalItems} resultados
-              </div>
-            )}
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="text-sm font-medium">
-              Página {currentPage} de {totalPages}
-            </div>
-            <div className="flex items-center space-x-1">
-              <button
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
-                onClick={() => setCurrentPage(1)}
-                disabled={currentPage === 1}
-              >
-                <ChevronsLeft className="h-4 w-4" />
-              </button>
-              <button
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-              <button
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
-                onClick={() => setCurrentPage(totalPages)}
-                disabled={currentPage === totalPages}
-              >
-                <ChevronsRight className="h-4 w-4" />
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }

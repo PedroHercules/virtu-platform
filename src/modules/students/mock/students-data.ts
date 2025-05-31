@@ -1,4 +1,4 @@
-export interface Student {
+export interface Student extends Record<string, unknown> {
   id: string;
   name: string;
   email: string;
@@ -96,6 +96,33 @@ export const studentsData: Student[] = [
   },
   {
     id: "8",
+    name: "Fernanda Lima",
+    email: "fernanda@email.com",
+    document: "369.258.147-00",
+    status: "active",
+    plan: plans[2],
+    createdAt: "2024-05-27T14:30:00Z",
+  },
+  {
+    id: "9",
+    name: "Carlos Eduardo",
+    email: "carlos@email.com",
+    document: "147.258.369-00",
+    status: "active",
+    plan: plans[1],
+    createdAt: "2024-05-27T15:00:00Z",
+  },
+  {
+    id: "10",
+    name: "Fernanda Lima",
+    email: "fernanda@email.com",
+    document: "369.258.147-00",
+    status: "active",
+    plan: plans[2],
+    createdAt: "2024-05-27T14:30:00Z",
+  },
+  {
+    id: "11",
     name: "Fernanda Lima",
     email: "fernanda@email.com",
     document: "369.258.147-00",
