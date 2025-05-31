@@ -1,16 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  Edit,
-  Eye,
-  MoreVertical,
-  PlusCircle,
-  Search,
-  Trash,
-  UserCheck,
-  UserX,
-} from "lucide-react";
+import { PlusCircle, Search } from "lucide-react";
 import { plans, studentsData } from "./mock/students-data";
 import {
   Select,
@@ -19,13 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DataTable } from "@/components/ui/data-table";
+import { useStudentsColumns, Student } from "./components/columns";
 import { homeRoutes } from "@/routes/home";
 import { useRouter } from "next/navigation";
 
@@ -40,7 +26,7 @@ export const Students = () => {
   const [planFilter, setPlanFilter] = React.useState("all");
 
   // Estado para seleção em lote
-  const [selectedStudents, setSelectedStudents] = React.useState<string[]>([]);
+  const [selectedStudents, setSelectedStudents] = React.useState<Student[]>([]);
 
   // Filtrar alunos
   const filteredStudents = React.useMemo(() => {
@@ -62,44 +48,53 @@ export const Students = () => {
   }, [searchTerm, statusFilter, planFilter]);
 
   // Handlers
-  const handleSelectAll = () => {
-    if (selectedStudents.length === filteredStudents.length) {
-      setSelectedStudents([]);
-    } else {
-      setSelectedStudents(filteredStudents.map((s) => s.id));
-    }
-  };
-
-  const handleSelectStudent = (studentId: string) => {
-    if (selectedStudents.includes(studentId)) {
-      setSelectedStudents(selectedStudents.filter((id) => id !== studentId));
-    } else {
-      setSelectedStudents([...selectedStudents, studentId]);
-    }
+  const handleDeleteStudent = (student: Student) => {
+    // TODO: Implementar deleção individual
+    console.log("Deletar aluno:", student.id);
+    setSelectedStudents((prev) => prev.filter((s) => s.id !== student.id));
   };
 
   const handleDeleteSelected = () => {
     // TODO: Implementar deleção em lote
-    console.log("Deletar alunos:", selectedStudents);
+    console.log(
+      "Deletar alunos:",
+      selectedStudents.map((s) => s.id)
+    );
     setSelectedStudents([]);
+  };
+
+  const handleUpdateStudentStatus = (
+    student: Student,
+    newStatus: "active" | "inactive"
+  ) => {
+    // TODO: Implementar atualização de status individual
+    console.log("Atualizar status do aluno:", student.id, "para", newStatus);
   };
 
   const handleUpdateStatusBatch = (newStatus: "active" | "inactive") => {
     // TODO: Implementar atualização de status em lote
     console.log(
       "Atualizar status dos alunos:",
-      selectedStudents,
+      selectedStudents.map((s) => s.id),
       "para",
       newStatus
     );
     setSelectedStudents([]);
   };
 
+  // Configuração das colunas usando o hook
+  const columns = useStudentsColumns({
+    onUpdateStatus: handleUpdateStudentStatus,
+    onDelete: handleDeleteStudent,
+  });
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Alunos</h1>
-        <button className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent/90">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-accent to-accent-foreground bg-clip-text text-transparent">
+          Alunos
+        </h1>
+        <button className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-foreground px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 backdrop-blur-sm">
           <PlusCircle size={18} />
           Novo Aluno
         </button>
@@ -115,7 +110,7 @@ export const Students = () => {
               placeholder="Buscar por nome, email ou documento..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="h-12 w-full rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm pl-10 pr-4 text-sm shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50"
             />
           </div>
         </div>
@@ -125,7 +120,7 @@ export const Students = () => {
             setStatusFilter(value)
           }
         >
-          <SelectTrigger>
+          <SelectTrigger className="h-12 rounded-xl border-border/30 bg-background/80 backdrop-blur-sm shadow-sm">
             <SelectValue placeholder="Filtrar por status" />
           </SelectTrigger>
           <SelectContent>
@@ -135,7 +130,7 @@ export const Students = () => {
           </SelectContent>
         </Select>
         <Select value={planFilter} onValueChange={setPlanFilter}>
-          <SelectTrigger>
+          <SelectTrigger className="h-12 rounded-xl border-border/30 bg-background/80 backdrop-blur-sm shadow-sm">
             <SelectValue placeholder="Filtrar por plano" />
           </SelectTrigger>
           <SelectContent>
@@ -151,26 +146,26 @@ export const Students = () => {
 
       {/* Ações em Lote */}
       {selectedStudents.length > 0 && (
-        <div className="flex items-center gap-4 rounded-lg bg-muted p-4">
-          <span className="text-sm font-medium">
+        <div className="flex items-center gap-4 rounded-xl bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 p-4 backdrop-blur-sm shadow-sm">
+          <span className="text-sm font-semibold text-accent">
             {selectedStudents.length} aluno(s) selecionado(s)
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleUpdateStatusBatch("active")}
-              className="rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-accent/90"
+              className="rounded-lg bg-emerald-500 px-3 py-1.5 text-sm font-medium text-white transition-all duration-200 hover:bg-emerald-600 hover:shadow-md"
             >
               Ativar
             </button>
             <button
               onClick={() => handleUpdateStatusBatch("inactive")}
-              className="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+              className="rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white transition-all duration-200 hover:bg-orange-600 hover:shadow-md"
             >
               Inativar
             </button>
             <button
               onClick={handleDeleteSelected}
-              className="rounded-lg bg-destructive px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-destructive/90"
+              className="rounded-lg bg-red-500 px-3 py-1.5 text-sm font-medium text-white transition-all duration-200 hover:bg-red-600 hover:shadow-md"
             >
               Excluir
             </button>
@@ -179,169 +174,27 @@ export const Students = () => {
       )}
 
       {/* Tabela de Alunos */}
-      <div className="rounded-lg border border-border">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-muted border-b border-border">
-              <tr>
-                <th className="w-12 p-4 text-left">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-border"
-                      checked={
-                        selectedStudents.length === filteredStudents.length &&
-                        filteredStudents.length > 0
-                      }
-                      onChange={handleSelectAll}
-                    />
-                  </div>
-                </th>
-                <th className="p-4 text-left text-sm font-medium">Nome</th>
-                <th className="p-4 text-left text-sm font-medium">Email</th>
-                <th className="p-4 text-left text-sm font-medium">Documento</th>
-                <th className="p-4 text-left text-sm font-medium">Plano</th>
-                <th className="p-4 text-left text-sm font-medium">Status</th>
-                <th className="p-4 text-left text-sm font-medium">
-                  Data de Cadastro
-                </th>
-                <th className="w-12 p-4"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filteredStudents.map((student) => (
-                <tr
-                  key={student.id}
-                  className="group hover:bg-muted/50 cursor-pointer"
-                  onClick={() =>
-                    router.push(homeRoutes.studentsDetails(student.id))
-                  }
-                >
-                  <td className="p-4">
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-border"
-                        checked={selectedStudents.includes(student.id)}
-                        onChange={() => handleSelectStudent(student.id)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-accent bg-opacity-20 flex items-center justify-center">
-                        <span className="text-sm font-medium text-accent">
-                          {student.name.charAt(0)}
-                        </span>
-                      </div>
-                      <span className="text-sm font-medium">
-                        {student.name}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <span className="text-sm">{student.email}</span>
-                  </td>
-                  <td className="p-4">
-                    <span className="text-sm">{student.document}</span>
-                  </td>
-                  <td className="p-4">
-                    <span className="text-sm font-medium">
-                      {student.plan.name}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        student.status === "active"
-                          ? "bg-accent bg-opacity-20 text-accent"
-                          : "bg-primary bg-opacity-20 text-primary"
-                      }`}
-                    >
-                      {student.status === "active" ? "Ativo" : "Inativo"}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <span className="text-sm">
-                      {new Date(student.createdAt).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button
-                          onClick={(e) => e.stopPropagation()}
-                          className="rounded-lg p-2 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-accent/10"
-                        >
-                          <MoreVertical
-                            size={16}
-                            className="text-muted-foreground"
-                          />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-48">
-                        <DropdownMenuItem
-                          className="gap-2"
-                          onClick={(e: React.MouseEvent) => {
-                            e.stopPropagation();
-                            router.push(homeRoutes.studentsDetails(student.id));
-                          }}
-                        >
-                          <Eye size={16} />
-                          <span>Ver detalhes</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2">
-                          <Edit size={16} />
-                          <span>Editar</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="gap-2 text-accent"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleUpdateStatusBatch("active");
-                          }}
-                          disabled={student.status === "active"}
-                        >
-                          <UserCheck size={16} />
-                          <span>Ativar</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="gap-2 text-primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleUpdateStatusBatch("inactive");
-                          }}
-                          disabled={student.status === "inactive"}
-                        >
-                          <UserX size={16} />
-                          <span>Inativar</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="gap-2 text-destructive focus:text-destructive"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteSelected();
-                          }}
-                        >
-                          <Trash size={16} />
-                          <span>Excluir</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <DataTable
+        data={filteredStudents}
+        columns={columns}
+        onRowClick={(student) =>
+          router.push(homeRoutes.studentsDetails(student.id))
+        }
+        pagination={{
+          enabled: true,
+          pageSize: 10,
+          pageSizeOptions: [5, 10, 20, 50],
+          showTotal: true,
+          showPageSizeSelector: true,
+        }}
+        selection={{
+          enabled: true,
+          selectedItems: selectedStudents,
+          onSelectionChange: setSelectedStudents,
+          getItemId: (student) => student.id,
+        }}
+        emptyMessage="Nenhum aluno encontrado"
+      />
     </div>
   );
 };
