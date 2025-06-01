@@ -2,11 +2,10 @@
 
 import * as React from "react";
 import { PlusCircle, Search, CheckCircle, XCircle, Trash } from "lucide-react";
-import { plans, studentsData } from "./mock/students-data";
+import { Student } from "./mock/students-data";
 import SelectInput from "@/components/ui/select-input";
 import { DataTable } from "@/components/ui/data-table";
 import { useStudentsColumns } from "./components/columns";
-import { Student } from "./mock/students-data";
 import { studentsRoutes } from "@/routes/students";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
@@ -17,7 +16,12 @@ type FiltersFormData = {
   planFilter: string;
 };
 
-export const Students: React.FC = () => {
+interface StudentsProps {
+  students: Student[];
+  plans: { id: string; name: string; monthlyFee: number }[];
+}
+
+export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
   const router = useRouter();
 
   const filtersForm = useForm<FiltersFormData>({
@@ -51,7 +55,7 @@ export const Students: React.FC = () => {
 
   // Filtrar alunos baseado nos valores do formulário
   const filteredStudents = React.useMemo(() => {
-    return studentsData.filter((student) => {
+    return students.filter((student) => {
       const matchesSearch =
         !searchTerm ||
         searchTerm === "" ||
@@ -67,7 +71,7 @@ export const Students: React.FC = () => {
 
       return matchesSearch && matchesStatus && matchesPlan;
     });
-  }, [searchTerm, statusFilter, planFilter]);
+  }, [students, searchTerm, statusFilter, planFilter]);
 
   // Handlers
   const handleDeleteStudent = (student: Student) => {

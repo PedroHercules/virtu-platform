@@ -1,10 +1,14 @@
 import { Students } from "@/modules/students/students";
+import { getStudents, getPlans } from "@/lib/services/students";
 import * as React from "react";
 
-export default function StudentsPage() {
+export default async function StudentsPage() {
+  // Busca os dados no servidor
+  const [students, plans] = await Promise.all([getStudents(), getPlans()]);
+
   return (
     <React.Suspense>
-      <Students />
+      <Students students={students} plans={plans} />
     </React.Suspense>
   );
 }

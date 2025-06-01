@@ -22,8 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import SelectInput from "@/components/ui/select-input";
-import { plans } from "./mock/students-data";
-import { graduationsData } from "./mock/graduations-data";
+import { Graduation } from "./mock/graduations-data";
 import { useRouter } from "next/navigation";
 import { studentsRoutes } from "@/routes/students";
 import { LoadingModal } from "@/components/ui/loading-modal";
@@ -41,7 +40,15 @@ const createStudentSchema = z.object({
 
 type CreateStudentFormData = z.infer<typeof createStudentSchema>;
 
-export const CreateStudent = () => {
+interface CreateStudentProps {
+  plans: { id: string; name: string; monthlyFee: number }[];
+  graduations: Graduation[];
+}
+
+export const CreateStudent: React.FC<CreateStudentProps> = ({
+  plans,
+  graduations,
+}) => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [showSuccessModal, setShowSuccessModal] = React.useState(false);
@@ -69,7 +76,7 @@ export const CreateStudent = () => {
   }));
 
   // Opções de graduações ordenadas por nível
-  const graduationOptions = graduationsData
+  const graduationOptions = graduations
     .sort((a, b) => a.level - b.level)
     .map((graduation) => ({
       value: graduation.id,

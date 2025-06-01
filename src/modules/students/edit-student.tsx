@@ -28,8 +28,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import SelectInput from "@/components/ui/select-input";
-import { plans, studentsData } from "./mock/students-data";
-import { graduationsData } from "./mock/graduations-data";
+import { Student } from "./mock/students-data";
+import { Graduation } from "./mock/graduations-data";
 import { useRouter } from "next/navigation";
 import { studentsRoutes } from "@/routes/students";
 import { LoadingModal } from "@/components/ui/loading-modal";
@@ -50,10 +50,16 @@ const editStudentSchema = z.object({
 type EditStudentFormData = z.infer<typeof editStudentSchema>;
 
 interface EditStudentProps {
-  studentId: string;
+  student: Student;
+  plans: { id: string; name: string; monthlyFee: number }[];
+  graduations: Graduation[];
 }
 
-export const EditStudent: React.FC<EditStudentProps> = ({ studentId }) => {
+export const EditStudent: React.FC<EditStudentProps> = ({
+  student,
+  plans,
+  graduations,
+}) => {
   const router = useRouter();
   const [isEditing, setIsEditing] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -64,39 +70,18 @@ export const EditStudent: React.FC<EditStudentProps> = ({ studentId }) => {
     details?: string;
   }>({ open: false, message: "", details: undefined });
 
-  // Buscar dados do estudante
-  const student = React.useMemo(
-    () => studentsData.find((s) => s.id === studentId),
-    [studentId]
-  );
-
   const form = useForm<EditStudentFormData>({
     resolver: zodResolver(editStudentSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      document: "",
-      planId: undefined,
-      graduationId: undefined,
-      status: "active",
+      name: student.name,
+      email: student.email,
+      phone: "", // Não temos phone nos dados mock
+      document: student.document,
+      planId: student.plan.id,
+      graduationId: undefined, // Não temos graduationId nos dados mock
+      status: student.status,
     },
   });
-
-  // Carregar dados do estudante no formulário
-  React.useEffect(() => {
-    if (student) {
-      form.reset({
-        name: student.name,
-        email: student.email,
-        phone: "", // Não temos phone nos dados mock
-        document: student.document,
-        planId: student.plan.id,
-        graduationId: undefined, // Não temos graduationId nos dados mock
-        status: student.status,
-      });
-    }
-  }, [student, form]);
 
   // Opções de planos com informações detalhadas
   const planOptions = plans.map((plan) => ({
@@ -105,7 +90,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({ studentId }) => {
   }));
 
   // Opções de graduações ordenadas por nível
-  const graduationOptions = graduationsData
+  const graduationOptions = graduations
     .sort((a, b) => a.level - b.level)
     .map((graduation) => ({
       value: graduation.id,
@@ -237,43 +222,18 @@ export const EditStudent: React.FC<EditStudentProps> = ({ studentId }) => {
   const handleToggleEdit = () => {
     if (isEditing) {
       // Se estava editando, restaurar valores originais
-      if (student) {
-        form.reset({
-          name: student.name,
-          email: student.email,
-          phone: "",
-          document: student.document,
-          planId: student.plan.id,
-          graduationId: undefined,
-          status: student.status,
-        });
-      }
+      form.reset({
+        name: student.name,
+        email: student.email,
+        phone: "",
+        document: student.document,
+        planId: student.plan.id,
+        graduationId: undefined,
+        status: student.status,
+      });
     }
     setIsEditing(!isEditing);
   };
-
-  if (!student) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 p-6">
-        <div className="container mx-auto h-full flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-4">
-              Aluno não encontrado
-            </h1>
-            <p className="text-foreground/60 mb-6">
-              O aluno que você está procurando não existe ou foi removido.
-            </p>
-            <button
-              onClick={handleBack}
-              className="h-12 px-6 rounded-xl bg-accent text-background font-semibold hover:bg-accent/90 transition-all duration-200"
-            >
-              Voltar para Lista
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 p-6">
