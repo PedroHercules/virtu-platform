@@ -3,7 +3,7 @@ import {
   getStudentById,
   getPlans,
   getGraduations,
-} from "@/lib/services/students";
+} from "@/modules/students/services/students-service";
 import { notFound } from "next/navigation";
 
 interface StudentDetailsPageProps {

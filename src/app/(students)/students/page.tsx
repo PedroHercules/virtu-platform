@@ -1,5 +1,8 @@
 import { Students } from "@/modules/students/students";
-import { getStudents, getPlans } from "@/lib/services/students";
+import {
+  getStudents,
+  getPlans,
+} from "@/modules/students/services/students-service";
 import * as React from "react";
 
 export default async function StudentsPage() {

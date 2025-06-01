@@ -1,5 +1,8 @@
 import { CreateStudent } from "@/modules/students/create-student";
-import { getPlans, getGraduations } from "@/lib/services/students";
+import {
+  getPlans,
+  getGraduations,
+} from "@/modules/students/services/students-service";
 
 export default async function CreateStudentPage() {
   // Busca os dados no servidor
