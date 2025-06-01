@@ -1,16 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Edit, Eye, MoreVertical, Trash, UserCheck, UserX } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Edit, Trash, UserCheck, UserX } from "lucide-react";
+import { ActionDropdown, ActionItem } from "@/components/ui/action-dropdown";
 import { DataTableColumn } from "@/components/ui/data-table";
-import { studentsRoutes } from "@/routes/students";
 import { useRouter } from "next/navigation";
 import { Student } from "../mock/students-data";
 
@@ -99,68 +92,39 @@ export const useStudentsColumns = ({
       key: "actions" as keyof Student,
       title: "",
       width: 48,
-      render: (_, student) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              onClick={(e) => e.stopPropagation()}
-              className="rounded-lg p-2 opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-accent/10"
-            >
-              <MoreVertical size={16} className="text-muted-foreground" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48">
-            <DropdownMenuItem
-              className="gap-2"
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                router.push(studentsRoutes.studentsDetails(student.id));
-              }}
-            >
-              <Eye size={16} />
-              <span>Ver detalhes</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="gap-2">
-              <Edit size={16} />
-              <span>Editar</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="gap-2 text-emerald-600"
-              onClick={(e) => {
-                e.stopPropagation();
-                onUpdateStatus(student, "active");
-              }}
-              disabled={student.status === "active"}
-            >
-              <UserCheck size={16} />
-              <span>Ativar</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="gap-2 text-orange-600"
-              onClick={(e) => {
-                e.stopPropagation();
-                onUpdateStatus(student, "inactive");
-              }}
-              disabled={student.status === "inactive"}
-            >
-              <UserX size={16} />
-              <span>Inativar</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="gap-2 text-red-600 focus:text-red-600"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(student);
-              }}
-            >
-              <Trash size={16} />
-              <span>Excluir</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      render: (_, student) => {
+        const actions: ActionItem[] = [
+          {
+            label: "Editar",
+            icon: <Edit size={16} />,
+            onClick: () => router.push(`/students/${student.id}/edit`),
+          },
+          {
+            label: "Ativar",
+            icon: <UserCheck size={16} />,
+            onClick: () => onUpdateStatus(student, "active"),
+            disabled: student.status === "active",
+            className: "text-emerald-600",
+            separator: true,
+          },
+          {
+            label: "Inativar",
+            icon: <UserX size={16} />,
+            onClick: () => onUpdateStatus(student, "inactive"),
+            disabled: student.status === "inactive",
+            className: "text-orange-600",
+          },
+          {
+            label: "Excluir",
+            icon: <Trash size={16} />,
+            onClick: () => onDelete(student),
+            className: "text-red-600 focus:text-red-600",
+            separator: true,
+          },
+        ];
+
+        return <ActionDropdown actions={actions} />;
+      },
     },
   ];
 };
