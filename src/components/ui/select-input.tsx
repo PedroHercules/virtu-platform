@@ -62,7 +62,7 @@ const sizeClasses = {
 };
 
 const variantClasses = {
-  default: "border-border/30 bg-background/80 backdrop-blur-sm shadow-sm",
+  default: "border-border/30 bg-input backdrop-blur-sm shadow-sm",
   ghost: "border-transparent bg-transparent hover:bg-background/50",
   outline: "border-border bg-transparent",
 };
@@ -94,7 +94,7 @@ export const SelectInput = React.forwardRef<
             "rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50",
             sizeClasses[size],
             variantClasses[variant],
-            disabled && "opacity-50 cursor-not-allowed",
+            disabled ? "bg-input/40 opacity-70 cursor-not-allowed" : "",
             className
           )}
           {...props}

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CheckCircle2, Users, UserPlus } from "lucide-react";
+import { CheckCircle2, Users, UserPlus, Edit3 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -19,6 +19,7 @@ interface StudentsSuccessModalProps {
   title?: string;
   description: string;
   onClose: () => void;
+  context?: "create" | "edit";
 }
 
 export function StudentsSuccessModal({
@@ -26,6 +27,7 @@ export function StudentsSuccessModal({
   title = "Operação realizada com sucesso!",
   description,
   onClose,
+  context = "create",
 }: StudentsSuccessModalProps) {
   const router = useRouter();
 
@@ -37,6 +39,11 @@ export function StudentsSuccessModal({
   const handleCreateNewStudent = () => {
     onClose();
     router.push(studentsRoutes.studentsCreate);
+  };
+
+  const handleContinueEditing = () => {
+    onClose();
+    // Mantém na mesma página de edição
   };
 
   return (
@@ -63,14 +70,25 @@ export function StudentsSuccessModal({
               Ver lista de alunos
             </Button>
 
-            <Button
-              onClick={handleCreateNewStudent}
-              className="flex-1"
-              variant="outline"
-            >
-              <UserPlus className="h-4 w-4 mr-2" />
-              Criar novo aluno
-            </Button>
+            {context === "create" ? (
+              <Button
+                onClick={handleCreateNewStudent}
+                className="flex-1"
+                variant="outline"
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Criar novo aluno
+              </Button>
+            ) : (
+              <Button
+                onClick={handleContinueEditing}
+                className="flex-1"
+                variant="outline"
+              >
+                <Edit3 className="h-4 w-4 mr-2" />
+                Continuar na página
+              </Button>
+            )}
           </div>
         </DialogFooter>
       </DialogContent>

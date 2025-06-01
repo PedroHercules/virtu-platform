@@ -186,7 +186,7 @@ export const CreateStudent = () => {
                             <input
                               {...field}
                               placeholder="Digite o nome completo do aluno"
-                              className="h-14 w-full rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground"
+                              className="h-14 w-full rounded-xl border border-border/30 bg-input px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground"
                             />
                           </FormControl>
                           <FormMessage />
@@ -211,7 +211,7 @@ export const CreateStudent = () => {
                               {...field}
                               type="email"
                               placeholder="Digite o email do aluno"
-                              className="h-14 w-full rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground"
+                              className="h-14 w-full rounded-xl border border-border/30 bg-input px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground"
                             />
                           </FormControl>
                           <FormMessage />
@@ -243,7 +243,7 @@ export const CreateStudent = () => {
                                 const formatted = formatPhone(e.target.value);
                                 field.onChange(formatted);
                               }}
-                              className="h-14 w-full rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground"
+                              className="h-14 w-full rounded-xl border border-border/30 bg-input px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground"
                             />
                           </FormControl>
                           <FormMessage />

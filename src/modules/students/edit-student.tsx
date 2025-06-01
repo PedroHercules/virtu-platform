@@ -363,7 +363,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({ studentId }) => {
                                 placeholder="Digite o nome completo do aluno"
                                 className={`h-14 w-full rounded-xl border border-border/30 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground ${
                                   isEditing
-                                    ? "bg-background/80"
+                                    ? "bg-input"
                                     : "bg-background/40 text-foreground/80"
                                 }`}
                               />
@@ -393,7 +393,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({ studentId }) => {
                                 placeholder="Digite o email do aluno"
                                 className={`h-14 w-full rounded-xl border border-border/30 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground ${
                                   isEditing
-                                    ? "bg-background/80"
+                                    ? "bg-input"
                                     : "bg-background/40 text-foreground/80"
                                 }`}
                               />
@@ -434,7 +434,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({ studentId }) => {
                                 }}
                                 className={`h-14 w-full rounded-xl border border-border/30 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground ${
                                   isEditing
-                                    ? "bg-background/80"
+                                    ? "bg-input"
                                     : "bg-background/40 text-foreground/80"
                                 }`}
                               />
@@ -472,7 +472,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({ studentId }) => {
                                 }}
                                 className={`h-14 w-full rounded-xl border border-border/30 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground ${
                                   isEditing
-                                    ? "bg-background/80"
+                                    ? "bg-input"
                                     : "bg-background/40 text-foreground/80"
                                 }`}
                               />
@@ -708,6 +708,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({ studentId }) => {
         title="Alterações salvas com sucesso!"
         description={`As informações do aluno ${form.getValues("name")} foram atualizadas com sucesso.`}
         onClose={handleCloseSuccessModal}
+        context="edit"
       />
     </div>
   );
