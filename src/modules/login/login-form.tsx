@@ -19,6 +19,7 @@ const loginSchema = z.object({
 
 export const LoginForm: React.FC = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -29,6 +30,7 @@ export const LoginForm: React.FC = () => {
   });
 
   const handleSubmit = async (data: z.infer<typeof loginSchema>) => {
+    setIsLoading(true);
     try {
       const response = await signIn("credentials", {
         redirect: false,
@@ -47,8 +49,11 @@ export const LoginForm: React.FC = () => {
       toast.error(
         error instanceof Error ? error.message : "Erro ao fazer login"
       );
+    } finally {
+      setIsLoading(false);
     }
   };
+
   return (
     <div className="flex min-h-screen w-full overflow-hidden relative bg-gradient-to-br from-background via-muted to-primary">
       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
@@ -112,11 +117,13 @@ export const LoginForm: React.FC = () => {
 
               <div className="space-y-4 mt-2">
                 <Button
+                  type="submit"
                   variant="accent"
                   size="lg"
-                  className="w-full h-12 text-lg font-medium transition-all hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-accent/80 via-accent to-accent/80 hover:opacity-90"
+                  disabled={isLoading}
+                  className="w-full h-12 text-lg font-medium transition-all hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-accent/80 via-accent to-accent/80 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  Acessar plataforma
+                  {isLoading ? "Acessando..." : "Acessar plataforma"}
                 </Button>
 
                 <div className="text-center text-sm text-muted-foreground">
