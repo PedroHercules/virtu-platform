@@ -10,6 +10,8 @@ export interface Student extends Record<string, unknown> {
     monthlyFee: number;
   };
   createdAt: string;
+  activeTime: string;
+  inactiveTime: string;
 }
 
 export const plans = [
@@ -39,6 +41,8 @@ export const studentsData: Student[] = [
     status: "active",
     plan: plans[2],
     createdAt: "2024-05-27T18:00:00Z",
+    activeTime: "8m 15d",
+    inactiveTime: "1m 5d",
   },
   {
     id: "2",
@@ -48,6 +52,8 @@ export const studentsData: Student[] = [
     status: "active",
     plan: plans[1],
     createdAt: "2024-05-27T17:30:00Z",
+    activeTime: "6m 20d",
+    inactiveTime: "2m 10d",
   },
   {
     id: "3",
@@ -57,6 +63,8 @@ export const studentsData: Student[] = [
     status: "inactive",
     plan: plans[0],
     createdAt: "2024-05-27T17:00:00Z",
+    activeTime: "4m 12d",
+    inactiveTime: "3m 8d",
   },
   {
     id: "4",
@@ -66,6 +74,8 @@ export const studentsData: Student[] = [
     status: "active",
     plan: plans[1],
     createdAt: "2024-05-27T16:30:00Z",
+    activeTime: "7m 2d",
+    inactiveTime: "1m 18d",
   },
   {
     id: "5",
@@ -75,6 +85,8 @@ export const studentsData: Student[] = [
     status: "active",
     plan: plans[2],
     createdAt: "2024-05-27T16:00:00Z",
+    activeTime: "5m 25d",
+    inactiveTime: "2m 3d",
   },
   {
     id: "6",
@@ -84,6 +96,8 @@ export const studentsData: Student[] = [
     status: "inactive",
     plan: plans[0],
     createdAt: "2024-05-27T15:30:00Z",
+    activeTime: "3m 14d",
+    inactiveTime: "4m 16d",
   },
   {
     id: "7",
@@ -93,6 +107,8 @@ export const studentsData: Student[] = [
     status: "active",
     plan: plans[1],
     createdAt: "2024-05-27T15:00:00Z",
+    activeTime: "6m 8d",
+    inactiveTime: "1m 22d",
   },
   {
     id: "8",
@@ -102,6 +118,8 @@ export const studentsData: Student[] = [
     status: "active",
     plan: plans[2],
     createdAt: "2024-05-27T14:30:00Z",
+    activeTime: "7m 11d",
+    inactiveTime: "1m 9d",
   },
   {
     id: "9",
@@ -111,6 +129,8 @@ export const studentsData: Student[] = [
     status: "active",
     plan: plans[1],
     createdAt: "2024-05-27T15:00:00Z",
+    activeTime: "6m 8d",
+    inactiveTime: "1m 22d",
   },
   {
     id: "10",
@@ -120,6 +140,8 @@ export const studentsData: Student[] = [
     status: "active",
     plan: plans[2],
     createdAt: "2024-05-27T14:30:00Z",
+    activeTime: "7m 11d",
+    inactiveTime: "1m 9d",
   },
   {
     id: "11",
@@ -129,5 +151,7 @@ export const studentsData: Student[] = [
     status: "active",
     plan: plans[2],
     createdAt: "2024-05-27T14:30:00Z",
+    activeTime: "7m 11d",
+    inactiveTime: "1m 9d",
   },
 ];

@@ -6,6 +6,7 @@ import { ActionDropdown, ActionItem } from "@/components/ui/action-dropdown";
 import { DataTableColumn } from "@/components/ui/data-table";
 import { useRouter } from "next/navigation";
 import { Student } from "../mock/students-data";
+import { studentsRoutes } from "@/routes";
 
 // Props para as ações das colunas
 interface ColumnActionsProps {
@@ -97,7 +98,7 @@ export const useStudentsColumns = ({
           {
             label: "Editar",
             icon: <Edit size={16} />,
-            onClick: () => router.push(`/students/${student.id}/edit`),
+            onClick: () => router.push(studentsRoutes.editStudent(student.id)),
           },
           {
             label: "Ativar",

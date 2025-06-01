@@ -203,7 +203,7 @@ export const Students: React.FC = () => {
         data={filteredStudents}
         columns={columns}
         onRowClick={(student) =>
-          router.push(studentsRoutes.studentsDetails(student.id))
+          router.push(studentsRoutes.editStudent(student.id))
         }
         pagination={{
           enabled: true,
