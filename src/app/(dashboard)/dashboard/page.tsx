@@ -1,10 +1,9 @@
 import { Dashboard } from "@/modules/dashboard/dashboard";
-import * as React from "react";
+import { getDashboardData } from "@/modules/dashboard/services";
 
-export default function DashboardPage() {
-  return (
-    <React.Suspense>
-      <Dashboard />
-    </React.Suspense>
-  );
+export default async function DashboardPage() {
+  // Busca os dados no servidor
+  const dashboardData = await getDashboardData();
+
+  return <Dashboard data={dashboardData} />;
 }

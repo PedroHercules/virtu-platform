@@ -1,6 +1,6 @@
 import * as React from "react";
-import { dashboardMockData } from "./mock/dashboard-data";
 import { Student, Plan } from "./types";
+import { DashboardMetrics } from "./services/dashboard-service";
 import { InfoIcon } from "@/components/ui/tooltip";
 import {
   Users,
@@ -10,22 +10,16 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-export const Dashboard: React.FC = () => {
-  const totalRevenue = dashboardMockData.recentStudents.reduce(
-    (acc, student) => acc + student.monthlyFee,
-    0
-  );
-  const averageRevenue = totalRevenue / dashboardMockData.totalStudents;
-  const activeStudentsPercentage =
-    (dashboardMockData.activeStudents / dashboardMockData.totalStudents) * 100;
+interface DashboardProps {
+  data: {
+    metrics: DashboardMetrics;
+    recentStudents: Student[];
+    topPlans: Plan[];
+  };
+}
 
-  const recentStudents: Student[] = dashboardMockData.recentStudents.slice(
-    0,
-    4
-  );
-  const topPlans: Plan[] = [...dashboardMockData.plans]
-    .sort((a, b) => b.studentsCount - a.studentsCount)
-    .slice(0, 5);
+export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
+  const { metrics, recentStudents, topPlans } = data;
 
   return (
     <div className="h-[calc(100vh-4rem)] p-6 flex flex-col gap-6">
@@ -53,7 +47,7 @@ export const Dashboard: React.FC = () => {
                   </span>
                 </div>
                 <h3 className="text-2xl font-bold text-emerald-600">
-                  {dashboardMockData.totalStudents}
+                  {metrics.totalStudents}
                 </h3>
               </div>
             </div>
@@ -65,7 +59,7 @@ export const Dashboard: React.FC = () => {
                   <InfoIcon tooltip="Alunos com mensalidade em dia e frequentando as aulas" />
                 </div>
                 <span className="text-sm font-semibold text-emerald-600">
-                  {dashboardMockData.activeStudents}
+                  {metrics.activeStudents}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -77,7 +71,7 @@ export const Dashboard: React.FC = () => {
                   <InfoIcon tooltip="Alunos com matrícula suspensa ou inadimplentes" />
                 </div>
                 <span className="text-sm font-semibold text-orange-600">
-                  {dashboardMockData.inactiveStudents}
+                  {metrics.inactiveStudents}
                 </span>
               </div>
             </div>
@@ -99,7 +93,7 @@ export const Dashboard: React.FC = () => {
                   <InfoIcon tooltip="Receita total gerada pelas mensalidades dos alunos ativos" />
                 </div>
                 <h3 className="text-2xl font-bold text-blue-600">
-                  {totalRevenue.toLocaleString("pt-BR", {
+                  {metrics.totalRevenue.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}
@@ -115,7 +109,7 @@ export const Dashboard: React.FC = () => {
                   <InfoIcon tooltip="Valor médio pago por aluno (faturamento total ÷ número de alunos)" />
                 </div>
                 <span className="text-sm font-semibold text-accent">
-                  {averageRevenue.toLocaleString("pt-BR", {
+                  {metrics.averageRevenue.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}
@@ -140,7 +134,7 @@ export const Dashboard: React.FC = () => {
                   <InfoIcon tooltip="Número de novos alunos que se matricularam no período atual" />
                 </div>
                 <h3 className="text-2xl font-bold text-purple-600">
-                  {recentStudents.length}
+                  {metrics.recentStudentsCount}
                 </h3>
               </div>
             </div>
@@ -170,7 +164,7 @@ export const Dashboard: React.FC = () => {
                   <InfoIcon tooltip="Percentual de alunos ativos em relação ao total de matriculados" />
                 </div>
                 <h3 className="text-2xl font-bold text-amber-600">
-                  {activeStudentsPercentage.toFixed(1)}%
+                  {metrics.activeStudentsPercentage.toFixed(1)}%
                 </h3>
               </div>
             </div>
@@ -178,7 +172,7 @@ export const Dashboard: React.FC = () => {
               <div className="w-full h-2 bg-muted/50 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-amber-400 to-amber-600 transition-all duration-500 ease-out"
-                  style={{ width: `${activeStudentsPercentage}%` }}
+                  style={{ width: `${metrics.activeStudentsPercentage}%` }}
                 />
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
@@ -187,7 +181,7 @@ export const Dashboard: React.FC = () => {
                   <InfoIcon tooltip="Meta ideal de retenção para uma academia saudável" />
                 </div>
                 <span className="text-amber-600 font-medium">
-                  {activeStudentsPercentage > 85
+                  {metrics.activeStudentsPercentage > 85
                     ? "Meta atingida!"
                     : "Abaixo da meta"}
                 </span>
