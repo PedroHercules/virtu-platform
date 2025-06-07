@@ -8,24 +8,39 @@ const config: Config = {
         sans: ["var(--font-inter)"],
       },
       colors: {
-        background: "#182038", // Azul profundo base
-        foreground: "#F2F2F2",
-        muted: "#1E1E3E", // Azul médio
+        background: "#EEF0F2", // Cinza claro principal
+        foreground: "#4C5454", // Cinza escuro para texto
+        muted: "#E0E2E4", // Variação mais escura do cinza claro
         primary: {
-          DEFAULT: "#141438", // Azul escuro
-          hover: "#1a1a2e",
+          DEFAULT: "#4C5454", // Cinza escuro principal
+          hover: "#3A4040",
         },
         secondary: {
-          DEFAULT: "#1E1E3E", // Azul médio
-          hover: "#232348",
+          DEFAULT: "#EEF0F2", // Cinza claro
+          hover: "#E0E2E4",
         },
         accent: {
-          DEFAULT: "#D4AF37", // Mantendo o dourado
-          hover: "#BF9F30",
-          foreground: "#F2F2F2",
+          DEFAULT: "#CD8B76", // Coral/terracota principal
+          hover: "#B7755F",
+          foreground: "#ffffff",
         },
-        border: "#1E1E3E", // Azul médio para bordas
-        input: "#141438", // Azul escuro para inputs
+        border: "#DDE0E2", // Tom entre o cinza claro e médio
+        input: "#FAFBFC", // Variação mais clara do background
+        destructive: {
+          DEFAULT: "#D67B6A", // Vermelho baseado no tom terracota
+          hover: "#C16853",
+          foreground: "#ffffff",
+        },
+        success: {
+          DEFAULT: "#8CAF88", // Verde suave que combina com a paleta
+          hover: "#7A9D76",
+          foreground: "#ffffff",
+        },
+        warning: {
+          DEFAULT: "#E4A76B", // Laranja suave que harmoniza
+          hover: "#D1945A",
+          foreground: "#ffffff",
+        },
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

@@ -3,11 +3,11 @@
 @import 'tailwindcss/utilities';
 
 :root {
-  --background: #1E1E2E;
-  --foreground: #F2F2F2;
-  --muted: #282838;
-  --border: #373750;
-  --input: #24243A;
+  --background: #EEF0F2;
+  --foreground: #4C5454;
+  --muted: #E0E2E4;
+  --border: #DDE0E2;
+  --input: #FAFBFC;
 }
 
 @keyframes float {
@@ -174,6 +174,6 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px #1e293b inset !important; /* Cor de fundo escura para combinar com o tema */
-  -webkit-text-fill-color: #ffffff !important; /* Cor do texto */
+  -webkit-box-shadow: 0 0 0 30px #FAFBFC inset !important; /* Cor de fundo clara para combinar com o tema */
+  -webkit-text-fill-color: #4C5454 !important; /* Cor do texto */
 }

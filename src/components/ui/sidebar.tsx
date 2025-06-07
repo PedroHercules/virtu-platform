@@ -15,9 +15,6 @@ import {
   Users,
   GraduationCap,
   Wallet,
-  Crown,
-  Swords,
-  Trophy,
 } from "lucide-react";
 
 export const Sidebar = () => {
@@ -52,108 +49,40 @@ export const Sidebar = () => {
   ];
 
   return (
-    <aside className="flex h-screen w-72 flex-col bg-gradient-to-b from-background via-primary to-secondary relative overflow-hidden border-r-2 border-accent/30">
-      {/* Martial Arts Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-10 w-32 h-32 border-2 border-accent rotate-45 rounded-lg" />
-        <div className="absolute top-40 right-8 w-24 h-24 border border-accent rotate-12" />
-        <div className="absolute bottom-40 left-6 w-28 h-28 border border-accent/50 rotate-45 rounded-full" />
-        <div className="absolute bottom-20 right-12 w-20 h-20 border-2 border-accent/70 rotate-12" />
-      </div>
-
-      {/* Header - Academy Style */}
-      <div className="relative z-10 p-6 border-b-2 border-accent/20 bg-gradient-to-r from-primary/50 to-secondary/30">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center shadow-2xl shadow-accent/40 border-4 border-accent/30 group-hover:scale-105 transition-all duration-700">
-              <Crown size={22} className="text-primary" />
-            </div>
-            {/* Belt indicator */}
-            <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-10 h-2 bg-gradient-to-r from-accent via-yellow-500 to-accent rounded-full border border-accent/50" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-black text-accent tracking-wider uppercase">
-              Virtu
-            </h1>
-          </div>
+    <aside className="flex h-screen w-72 flex-col bg-background border-r border-border shadow-sm">
+      {/* Header */}
+      <div className="flex items-center gap-3 p-6 border-b border-border">
+        <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center">
+          <span className="text-accent-foreground font-bold text-lg">V</span>
         </div>
+        <h1 className="text-xl font-semibold text-foreground">Virtu</h1>
       </div>
 
-      {/* Navigation - Combat Menu */}
-      <nav className="flex-1 px-5 py-4 relative z-10">
+      {/* Navigation */}
+      <nav className="flex-1 px-4 py-6">
         <ul className="space-y-2">
           {menuItems.map((item) => (
-            <li key={item.path} className="group">
+            <li key={item.path}>
               {item.disabled ? (
-                <div className="relative flex cursor-not-allowed items-center gap-4 rounded-lg px-4 py-3 opacity-40 transition-all duration-300 border border-foreground/10">
-                  <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-foreground/10 to-foreground/5 border border-foreground/20">
-                    <item.icon size={18} className="text-foreground/50" />
+                <div className="flex items-center gap-3 px-3 py-2 text-foreground/40 cursor-not-allowed opacity-50">
+                  <div className="flex items-center justify-center w-5 h-5">
+                    <item.icon size={18} />
                   </div>
-                  <span className="font-bold text-foreground/50 text-sm tracking-wide flex-1">
-                    {item.name}
-                  </span>
-                  <div className="ml-auto flex items-center gap-1">
-                    <Swords
-                      size={16}
-                      className={`text-foreground/70 transition-all duration-500 ${
-                        pathname === item.path
-                          ? "text-yellow-500"
-                          : "group-hover:text-accent/80"
-                      }`}
-                    />
-                  </div>
+                  <span className="text-sm font-medium">{item.name}</span>
                 </div>
               ) : (
                 <Link
                   href={item.path}
-                  className={`relative flex items-center gap-4 rounded-lg px-4 py-3 transition-all duration-500 border-2 group-hover:scale-[1.01] group-hover:shadow-lg ${
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     pathname === item.path
-                      ? "bg-gradient-to-r from-accent/20 via-accent/15 to-accent/10 border-accent/50 shadow-xl shadow-accent/20"
-                      : "border-transparent hover:border-accent/30 hover:bg-secondary/40 hover:shadow-md hover:shadow-accent/10"
+                      ? "bg-accent/15 text-accent border-l-4 border-accent"
+                      : "text-foreground/80 hover:bg-muted hover:text-foreground"
                   }`}
                 >
-                  {/* Active indicator */}
-                  {pathname === item.path && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-accent via-yellow-500 to-accent rounded-r-lg" />
-                  )}
-
-                  <div
-                    className={`flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-500 border-2 ${
-                      pathname === item.path
-                        ? "bg-gradient-to-br from-accent/30 to-accent/20 border-accent/60 shadow-lg shadow-accent/30 scale-105 rotate-12"
-                        : "bg-gradient-to-br from-foreground/10 to-foreground/5 border-foreground/20 group-hover:border-accent/40 group-hover:bg-accent/10 group-hover:scale-105 group-hover:rotate-6"
-                    }`}
-                  >
-                    <item.icon
-                      size={18}
-                      className={`transition-all duration-500 ${
-                        pathname === item.path
-                          ? "text-yellow-500"
-                          : "text-foreground/80 group-hover:text-accent"
-                      }`}
-                    />
+                  <div className="flex items-center justify-center w-5 h-5">
+                    <item.icon size={18} />
                   </div>
-
-                  <span
-                    className={`font-bold text-sm tracking-wide transition-colors duration-300 flex-1 ${
-                      pathname === item.path
-                        ? "text-accent"
-                        : "text-foreground/90 group-hover:text-accent"
-                    }`}
-                  >
-                    {item.name}
-                  </span>
-
-                  <div className="ml-auto flex items-center gap-1">
-                    <Swords
-                      size={16}
-                      className={`text-foreground/70 transition-all duration-500 ${
-                        pathname === item.path
-                          ? "text-yellow-500"
-                          : "group-hover:text-accent/80"
-                      }`}
-                    />
-                  </div>
+                  <span>{item.name}</span>
                 </Link>
               )}
             </li>
@@ -161,50 +90,31 @@ export const Sidebar = () => {
         </ul>
       </nav>
 
-      {/* Professor/Instructor Section */}
-      <div className="relative z-10 p-5 border-t-2 border-accent/30 bg-gradient-to-r from-primary/60 via-secondary/40 to-primary/60">
+      {/* User Section */}
+      <div className="p-4 border-t border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="relative group">
-              <div className="h-11 w-11 rounded-full bg-gradient-to-br from-accent via-accent/90 to-accent/70 flex items-center justify-center text-primary font-black text-base shadow-xl shadow-accent/40 border-3 border-accent/40 group-hover:scale-110 transition-all duration-500">
+            <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+              <span className="text-foreground font-medium text-sm">
                 {session?.user?.username?.[0]?.toUpperCase()}
-              </div>
-
-              {/* Professor rank indicators */}
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full border-2 border-primary flex items-center justify-center">
-                <Trophy size={10} className="text-primary" />
-              </div>
+              </span>
             </div>
-
             <div className="flex flex-col">
-              <span className="text-sm font-black text-foreground tracking-wide truncate max-w-[140px]">
+              <span className="text-sm font-medium text-foreground truncate max-w-[140px]">
                 {session?.user?.username}
               </span>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                <span className="text-xs text-green-400 font-bold uppercase tracking-wider">
-                  No tatame
-                </span>
-              </div>
+              <span className="text-xs text-foreground/60">Instrutor</span>
             </div>
           </div>
-
           <button
             onClick={() => signOut()}
-            className="group flex items-center justify-center w-10 h-10 rounded-lg text-foreground/70 transition-all duration-500 hover:bg-red-500/15 hover:text-red-400 hover:scale-110 hover:rotate-180 border-2 border-transparent hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/30"
-            title="Sair da Academia"
+            className="flex items-center justify-center w-8 h-8 rounded-lg text-foreground/60 hover:bg-destructive/10 hover:text-destructive transition-colors"
+            title="Sair"
           >
-            <LogOut
-              size={18}
-              className="group-hover:scale-125 transition-all duration-500"
-            />
+            <LogOut size={16} />
           </button>
         </div>
       </div>
-
-      {/* Traditional border decoration */}
-      <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-accent/20 via-accent to-accent/20" />
-      <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gradient-to-r from-accent/20 via-accent to-accent/20" />
     </aside>
   );
 };
