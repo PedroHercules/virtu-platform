@@ -55,15 +55,15 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full overflow-hidden relative bg-gradient-to-br from-background via-muted to-primary">
-      <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+    <div className="flex min-h-screen w-full overflow-hidden relative bg-background">
+      <div className="absolute inset-0 bg-gradient-to-br from-muted/30 to-accent/10" />
       <div className="w-full flex flex-col justify-center items-center p-8 lg:p-16 relative z-10">
-        <div className="w-full max-w-md space-y-8 animate-fade-in bg-background/40 p-8 rounded-2xl border border-accent/5 shadow-2xl backdrop-blur-sm">
+        <div className="w-full max-w-md space-y-8 animate-fade-in bg-secondary p-8 rounded-2xl border border-border shadow-2xl">
           <div className="text-center">
-            <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-accent to-accent-foreground bg-clip-text text-transparent">
+            <h1 className="text-4xl lg:text-6xl font-bold text-accent">
               Virtu
             </h1>
-            <p className="mt-4 text-xl text-muted-foreground">
+            <p className="mt-4 text-xl text-foreground/70">
               Acesse sua conta na Plataforma Virtu
             </p>
           </div>
@@ -85,7 +85,7 @@ export const LoginForm: React.FC = () => {
                           type="email"
                           id="email"
                           required
-                          className="h-12 px-4 bg-primary-hover transition-all focus:border-accent"
+                          className="h-12 px-4 bg-input border-border transition-all focus:border-accent"
                           placeholder="Digite seu e-mail"
                           {...field}
                         />
@@ -105,7 +105,7 @@ export const LoginForm: React.FC = () => {
                           type="password"
                           id="password"
                           required
-                          className="h-12 px-4 bg-primary-hover transition-all focus:border-accent"
+                          className="h-12 px-4 bg-input border-border transition-all focus:border-accent"
                           placeholder="Digite sua senha"
                           {...field}
                         />
@@ -121,12 +121,12 @@ export const LoginForm: React.FC = () => {
                   variant="accent"
                   size="lg"
                   disabled={isLoading}
-                  className="w-full h-12 text-lg font-medium transition-all hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-accent/80 via-accent to-accent/80 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="w-full h-12 text-lg font-medium transition-all hover:scale-[1.02] active:scale-[0.98] bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   {isLoading ? "Acessando..." : "Acessar plataforma"}
                 </Button>
 
-                <div className="text-center text-sm text-muted-foreground">
+                <div className="text-center text-sm text-foreground/60">
                   <Link
                     href="/auth/forgot-password"
                     className="hover:text-accent transition-colors"
@@ -139,13 +139,13 @@ export const LoginForm: React.FC = () => {
           </Form>
 
           <div className="mt-8 text-center">
-            <p className="text-sm text-muted-foreground italic">
+            <p className="text-sm text-foreground/60 italic">
               &ldquo;Seja como a água, meu amigo&rdquo;
-              <span className="block text-xs mt-1 text-muted-foreground/60">
+              <span className="block text-xs mt-1 text-foreground/50">
                 - Bruce Lee
               </span>
             </p>
-            <p className="text-xs text-muted-foreground/60 mt-2">
+            <p className="text-xs text-foreground/50 mt-2">
               © 2025 Virtu - Todos os direitos reservados
             </p>
           </div>
