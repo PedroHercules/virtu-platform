@@ -25,10 +25,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ data }) => {
     <div className="h-[calc(100vh-4rem)] p-6 flex flex-col gap-6 bg-background">
       {/* Cabeçalho */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-foreground">
-          Painel de Controle
-        </h1>
-        <p className="text-foreground/60">Visão geral da academia</p>
+        <h1 className="text-3xl font-black text-accent">Painel de Controle</h1>
+        <p className="text-foreground/60 font-medium">
+          Visão geral da academia
+        </p>
       </div>
 
       {/* Cards Principais */}

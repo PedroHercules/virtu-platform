@@ -4,6 +4,7 @@ import * as React from "react";
 import { PlusCircle, Search, CheckCircle, XCircle, Trash } from "lucide-react";
 import { Student } from "./mock/students-data";
 import SelectInput from "@/components/ui/select-input";
+import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/ui/data-table";
 import { useStudentsColumns } from "./components/columns";
 import { studentsRoutes } from "@/routes/students";
@@ -115,14 +116,17 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
   });
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 bg-background">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-accent to-accent-foreground bg-clip-text text-transparent">
-          Alunos
-        </h1>
+        <div>
+          <h1 className="text-3xl font-black text-accent">Alunos</h1>
+          <p className="text-foreground/60 font-medium">
+            Gerencie os alunos da academia
+          </p>
+        </div>
         <button
           onClick={() => router.push(studentsRoutes.studentsCreate)}
-          className="inline-flex items-center gap-2 rounded-xl bg-accent border border-border px-6 py-3 text-sm font-semibold text-background hover:bg-accent-hover shadow-lg transition-all duration-200 hover:shadow-xl backdrop-blur-sm"
+          className="inline-flex items-center gap-2 rounded-xl bg-accent border border-border px-6 py-3 text-sm font-semibold text-accent-foreground hover:bg-accent-hover shadow-lg transition-all duration-200 hover:shadow-xl"
         >
           <PlusCircle size={18} />
           Novo Aluno
@@ -133,12 +137,13 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
       <form className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="md:col-span-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
+            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/60 z-10" />
+            <Input
               {...register("searchTerm")}
               type="text"
               placeholder="Buscar por nome, email ou documento..."
-              className="h-12 w-full rounded-xl border border-border/30 bg-background/80 backdrop-blur-sm pl-10 pr-4 text-sm shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50"
+              inputSize="md"
+              className="pl-10 text-md"
             />
           </div>
         </div>
@@ -172,28 +177,28 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
 
       {/* Ações em Lote */}
       {selectedStudents.length > 0 && (
-        <div className="flex items-center gap-4 rounded-xl bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 p-4 backdrop-blur-sm shadow-sm">
+        <div className="flex items-center gap-4 rounded-xl bg-secondary border border-border p-4 shadow-sm">
           <span className="text-sm font-semibold text-accent">
             {selectedStudents.length} aluno(s) selecionado(s)
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleUpdateStatusBatch("active")}
-              className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary border border-border hover:bg-primary-hover text-foreground hover:text-accent transition-all duration-200 shadow-sm hover:shadow-md"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-success border border-border hover:bg-success-hover text-success-foreground transition-all duration-200 shadow-sm hover:shadow-md"
               title="Ativar selecionados"
             >
               <CheckCircle size={16} />
             </button>
             <button
               onClick={() => handleUpdateStatusBatch("inactive")}
-              className="flex items-center justify-center w-10 h-10 rounded-xl bg-secondary border border-border hover:bg-secondary-hover text-foreground hover:text-accent transition-all duration-200 shadow-sm hover:shadow-md"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-warning border border-border hover:bg-warning-hover text-warning-foreground transition-all duration-200 shadow-sm hover:shadow-md"
               title="Inativar selecionados"
             >
               <XCircle size={16} />
             </button>
             <button
               onClick={handleDeleteSelected}
-              className="flex items-center justify-center w-10 h-10 rounded-xl bg-muted border border-border hover:bg-accent/20 text-foreground hover:text-accent transition-all duration-200 shadow-sm hover:shadow-md"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-destructive border border-border hover:bg-destructive-hover text-destructive-foreground transition-all duration-200 shadow-sm hover:shadow-md"
               title="Excluir selecionados"
             >
               <Trash size={16} />

@@ -119,7 +119,7 @@ export const useStudentsColumns = ({
             label: "Excluir",
             icon: <Trash size={16} />,
             onClick: () => onDelete(student),
-            className: "text-red-600 focus:text-red-600",
+            className: "text-red-600",
             separator: true,
           },
         ];

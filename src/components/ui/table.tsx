@@ -6,7 +6,7 @@ const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto rounded-2xl border border-border/30 bg-gradient-to-br from-background/80 via-background to-primary/10 backdrop-blur-sm shadow-xl">
+  <div className="relative w-full overflow-auto rounded-2xl border border-border bg-secondary shadow-lg">
     <table
       ref={ref}
       className={cn("w-full caption-bottom text-sm", className)}
@@ -22,10 +22,7 @@ const TableHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <thead
     ref={ref}
-    className={cn(
-      "bg-gradient-to-r from-background/50 to-primary/20 border-b border-border/30 [&_tr]:border-0",
-      className
-    )}
+    className={cn("bg-muted border-b border-border [&_tr]:border-0", className)}
     {...props}
   />
 ));
@@ -50,7 +47,7 @@ const TableFooter = React.forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      "border-t border-border/30 bg-gradient-to-r from-background/80 to-primary/20 font-medium [&>tr]:last:border-b-0",
+      "border-t border-border bg-muted font-medium [&>tr]:last:border-b-0",
       className
     )}
     {...props}
@@ -65,7 +62,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b border-border/30 transition-all duration-200 hover:bg-primary/10 data-[state=selected]:bg-accent/10",
+      "border-b border-border transition-all duration-200 hover:bg-muted data-[state=selected]:bg-accent/20",
       className
     )}
     {...props}
