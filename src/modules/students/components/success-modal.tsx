@@ -51,8 +51,8 @@ export function StudentsSuccessModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="h-16 w-16 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-              <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+            <div className="h-16 w-16 rounded-full bg-success/10 flex items-center justify-center border border-success/20">
+              <CheckCircle2 className="h-8 w-8 text-success" />
             </div>
           </div>
           <DialogTitle className="text-xl">{title}</DialogTitle>

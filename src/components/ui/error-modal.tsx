@@ -36,20 +36,22 @@ export function ErrorModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
           <div className="flex justify-center mb-6">
-            <div className="h-16 w-16 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20">
-              <XCircle className="h-8 w-8 text-red-600" />
+            <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center border border-destructive/20">
+              <XCircle className="h-8 w-8 text-destructive" />
             </div>
           </div>
-          <DialogTitle className="text-xl text-red-600">{title}</DialogTitle>
+          <DialogTitle className="text-xl text-destructive">
+            {title}
+          </DialogTitle>
           <DialogDescription className="mt-3 text-base">
             {message}
           </DialogDescription>
         </DialogHeader>
 
         {details && (
-          <div className="bg-muted/50 rounded-lg p-4 border border-border mt-4">
+          <div className="bg-muted rounded-lg p-4 border border-border mt-4">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
+              <AlertTriangle className="h-5 w-5 text-warning mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-foreground mb-2">
                   Detalhes técnicos:

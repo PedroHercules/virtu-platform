@@ -145,13 +145,13 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="container mx-auto h-full">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={handleBack}
-            className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-secondary/80 to-secondary/60 border border-border/30 hover:from-secondary hover:to-secondary/80 transition-all duration-200 hover:shadow-lg group"
+            className="flex items-center justify-center w-12 h-12 rounded-xl bg-secondary border border-border hover:bg-secondary-hover transition-all duration-200 hover:shadow-lg group"
           >
             <ArrowLeft
               size={20}
@@ -159,9 +159,7 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
             />
           </button>
           <div>
-            <h1 className="text-3xl font-black bg-gradient-to-r from-accent via-accent/90 to-accent/70 bg-clip-text text-transparent">
-              Novo Aluno
-            </h1>
+            <h1 className="text-3xl font-black text-accent">Novo Aluno</h1>
             <p className="text-foreground/60 font-medium">
               Cadastre um novo aluno na academia
             </p>
@@ -170,7 +168,7 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
 
         {/* Main Content - Full Width */}
         <div className="w-full">
-          <div className="bg-gradient-to-br from-primary/50 via-background/95 to-secondary/30 backdrop-blur-sm border border-border/30 rounded-2xl shadow-xl shadow-accent/5 p-8">
+          <div className="bg-input border border-border rounded-2xl shadow-xl p-8">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -321,7 +319,7 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="h-14 px-16 rounded-xl border border-border bg-secondary-hover hover:bg-background/80 text-foreground font-semibold transition-all duration-200 hover:shadow-md text-base"
+                    className="h-14 px-16 rounded-xl border border-border bg-secondary hover:bg-secondary-hover text-foreground font-semibold transition-all duration-200 hover:shadow-md text-base"
                     disabled={isSubmitting}
                   >
                     Cancelar
@@ -329,7 +327,7 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="h-14 px-16 rounded-xl bg-gradient-to-r from-accent to-accent/90 hover:from-accent hover:to-accent text-primary font-bold shadow-lg shadow-accent/30 transition-all duration-200 hover:shadow-xl hover:shadow-accent/40 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-base"
+                    className="h-14 px-16 rounded-xl bg-accent hover:bg-accent-hover text-accent-foreground font-bold shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-base"
                   >
                     <CheckCircle size={20} />
                     Criar Aluno
