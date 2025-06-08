@@ -33,20 +33,6 @@ export function LoadingModal({
           <DialogTitle className="text-xl">{title}</DialogTitle>
           <DialogDescription className="mt-2">{description}</DialogDescription>
         </DialogHeader>
-
-        <div className="flex justify-center py-4">
-          <div className="flex space-x-1">
-            <div className="w-2 h-2 bg-accent rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-            <div className="w-2 h-2 bg-accent rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-            <div className="w-2 h-2 bg-accent rounded-full animate-bounce"></div>
-          </div>
-        </div>
-
-        <div className="text-center pb-2">
-          <p className="text-sm text-muted-foreground">
-            Esta operação pode levar alguns instantes...
-          </p>
-        </div>
       </DialogContent>
     </Dialog>
   );
