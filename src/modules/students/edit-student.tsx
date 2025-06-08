@@ -236,13 +236,13 @@ export const EditStudent: React.FC<EditStudentProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="container mx-auto h-full">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={handleBack}
-            className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-secondary/80 to-secondary/60 border border-border/30 hover:from-secondary hover:to-secondary/80 transition-all duration-200 hover:shadow-lg group"
+            className="flex items-center justify-center w-12 h-12 rounded-xl bg-secondary border border-border hover:bg-secondary-hover transition-all duration-200 hover:shadow-lg group"
           >
             <ArrowLeft
               size={20}
@@ -251,14 +251,14 @@ export const EditStudent: React.FC<EditStudentProps> = ({
           </button>
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-black bg-gradient-to-r from-accent via-accent/90 to-accent/70 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-black text-accent">
                 {isEditing ? "Editar Aluno" : "Visualizar Aluno"}
               </h1>
               <div
                 className={`px-3 py-1 rounded-full text-xs font-semibold ${
                   student.status === "active"
-                    ? "bg-green-100 text-green-800 border border-green-200"
-                    : "bg-red-100 text-red-800 border border-red-200"
+                    ? "bg-success/20 text-success border border-success/30"
+                    : "bg-destructive/20 text-destructive border border-destructive/30"
                 }`}
               >
                 {student.status === "active" ? "Ativo" : "Inativo"}
@@ -274,8 +274,8 @@ export const EditStudent: React.FC<EditStudentProps> = ({
             onClick={handleToggleEdit}
             className={`flex items-center gap-2 h-12 px-6 rounded-xl font-semibold transition-all duration-200 ${
               isEditing
-                ? "bg-secondary border border-border hover:bg-secondary/80 text-foreground"
-                : "bg-accent text-background hover:bg-accent/90 shadow-lg shadow-accent/20"
+                ? "bg-secondary border border-border hover:bg-secondary-hover text-foreground"
+                : "bg-accent hover:bg-accent-hover text-accent-foreground shadow-lg"
             }`}
             disabled={isSubmitting}
           >
@@ -297,7 +297,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:items-start">
           {/* Informações do Aluno - Coluna principal */}
           <div className="lg:col-span-2 h-full">
-            <div className="bg-gradient-to-br from-primary/50 via-background/95 to-secondary/30 backdrop-blur-sm border border-border/30 rounded-2xl shadow-xl shadow-accent/5 p-8 h-full flex flex-col">
+            <div className="bg-input border border-border rounded-2xl shadow-xl p-8 h-full flex flex-col">
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
@@ -321,10 +321,10 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                                 {...field}
                                 disabled={!isEditing}
                                 placeholder="Digite o nome completo do aluno"
-                                className={`h-14 w-full rounded-xl border border-border/30 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground ${
+                                className={`h-14 w-full rounded-xl border border-border/30 px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground ${
                                   isEditing
                                     ? "bg-input"
-                                    : "bg-background/40 text-foreground/80"
+                                    : "bg-secondary text-foreground/80"
                                 }`}
                               />
                             </FormControl>
@@ -351,10 +351,10 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                                 type="email"
                                 disabled={!isEditing}
                                 placeholder="Digite o email do aluno"
-                                className={`h-14 w-full rounded-xl border border-border/30 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground ${
+                                className={`h-14 w-full rounded-xl border border-border/30 px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground ${
                                   isEditing
                                     ? "bg-input"
-                                    : "bg-background/40 text-foreground/80"
+                                    : "bg-secondary text-foreground/80"
                                 }`}
                               />
                             </FormControl>
@@ -392,10 +392,10 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                                     field.onChange(formatted);
                                   }
                                 }}
-                                className={`h-14 w-full rounded-xl border border-border/30 backdrop-blur-sm px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground ${
+                                className={`h-14 w-full rounded-xl border border-border/30 px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground ${
                                   isEditing
                                     ? "bg-input"
-                                    : "bg-background/40 text-foreground/80"
+                                    : "bg-secondary text-foreground/80"
                                 }`}
                               />
                             </FormControl>
@@ -548,7 +548,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                       <button
                         type="button"
                         onClick={handleToggleEdit}
-                        className="h-14 px-16 rounded-xl border border-border bg-secondary-hover hover:bg-background/80 text-foreground font-semibold transition-all duration-200 hover:shadow-md text-base"
+                        className="h-14 px-16 rounded-xl border border-border bg-secondary hover:bg-secondary-hover text-foreground font-semibold transition-all duration-200 hover:shadow-md text-base"
                         disabled={isSubmitting}
                       >
                         Cancelar
@@ -556,7 +556,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="h-14 px-16 rounded-xl bg-gradient-to-r from-accent to-accent/90 hover:from-accent hover:to-accent text-primary font-bold shadow-lg shadow-accent/30 transition-all duration-200 hover:shadow-xl hover:shadow-accent/40 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-base"
+                        className="h-14 px-16 rounded-xl bg-accent hover:bg-accent-hover text-accent-foreground font-bold shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-base"
                       >
                         <Save size={20} />
                         Salvar Alterações
@@ -571,7 +571,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
           {/* Sidebar de Informações Adicionais */}
           <div className="space-y-6">
             {/* Informações do Plano */}
-            <div className="bg-gradient-to-br from-accent/10 via-background/95 to-accent/5 backdrop-blur-sm border border-accent/20 rounded-2xl shadow-lg p-6">
+            <div className="bg-input border border-border rounded-2xl shadow-lg p-6">
               <h3 className="text-lg font-bold text-accent mb-4 flex items-center gap-2">
                 <CreditCard size={20} />
                 Plano Assinado
@@ -601,7 +601,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
             </div>
 
             {/* Informações de Cadastro */}
-            <div className="bg-gradient-to-br from-secondary/30 via-background/95 to-secondary/10 backdrop-blur-sm border border-border/30 rounded-2xl shadow-lg p-6">
+            <div className="bg-input border border-border rounded-2xl shadow-lg p-6">
               <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
                 <Calendar size={20} className="text-accent" />
                 Histórico
