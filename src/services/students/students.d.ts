@@ -2,7 +2,8 @@ export interface StudentDTO {
   name: string;
   email: string;
   phone: string;
-  active?: boolean;
+  status?: "active" | "inactive";
+  document?: string;
   graduationId?: string;
   planId?: string;
 }
@@ -22,7 +23,8 @@ export interface StudentEntity {
   name: string;
   email: string;
   phone: string;
-  active: boolean;
+  status: "active" | "inactive";
+  document?: string;
   graduationId?: string;
   planId?: string;
   activeTime?: number;

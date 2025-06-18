@@ -38,6 +38,7 @@ import {
   EditStudentFormData,
   editStudentSchema,
 } from "@/modules/students/schemas/edit-student.schema";
+import { updateStudentService } from "@/services/students/update-student.service";
 
 interface EditStudentProps {
   student: StudentEntity;
@@ -65,11 +66,11 @@ export const EditStudent: React.FC<EditStudentProps> = ({
     defaultValues: {
       name: student.name,
       email: student.email,
-      phone: "", // Não temos phone nos dados mock
-      document: "",
+      phone: student.phone, // Não temos phone nos dados mock
+      document: student.document,
       planId: student.Subscription?.[0]?.planId,
       graduationId: student.StudentGraduation?.[0]?.graduationId, // Não temos graduationId nos dados mock
-      status: student.active ? "active" : "inactive",
+      status: student.status,
     },
   });
 
@@ -165,17 +166,10 @@ export const EditStudent: React.FC<EditStudentProps> = ({
     setIsSubmitting(true);
 
     try {
-      // Simular chamada de API
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Simular erro aleatório para demonstração
-      if (Math.random() > 0.8) {
-        throw new Error("Erro ao salvar alterações");
-      }
-
-      console.log("Dados atualizados do aluno:", data);
-
-      // Sair do modo de edição e mostrar modal de sucesso
+      await updateStudentService(student.id, {
+        ...data,
+      });
+      form.reset();
       setIsEditing(false);
       setShowSuccessModal(true);
     } catch (error) {
@@ -215,11 +209,11 @@ export const EditStudent: React.FC<EditStudentProps> = ({
       form.reset({
         name: student.name,
         email: student.email,
-        phone: "", // Não temos phone nos dados mock
-        document: "",
+        phone: student.phone,
+        document: student.document,
         planId: student.Subscription?.[0]?.planId,
         graduationId: student.StudentGraduation?.[0]?.graduationId,
-        status: student.active ? "active" : "inactive",
+        status: student.status,
       });
     }
     setIsEditing(!isEditing);
@@ -246,12 +240,12 @@ export const EditStudent: React.FC<EditStudentProps> = ({
               </h1>
               <div
                 className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  student.active
+                  student.status === "active"
                     ? "bg-success/20 text-success border border-success/30"
                     : "bg-destructive/20 text-destructive border border-destructive/30"
                 }`}
               >
-                {student.active ? "Ativo" : "Inativo"}
+                {student.status === "active" ? "Ativo" : "Inativo"}
               </div>
             </div>
             <p className="text-foreground/60 font-medium">
