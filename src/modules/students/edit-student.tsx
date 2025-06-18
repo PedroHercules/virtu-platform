@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   ArrowLeft,
   User,
@@ -35,19 +34,10 @@ import { ErrorModal } from "@/components/ui/error-modal";
 import { StudentsSuccessModal } from "./components/success-modal";
 import { GraduationEntity, StudentEntity } from "@/services/students/students";
 import { PlanEntity } from "@/services/plans/plan";
-
-// Schema de validação
-const editStudentSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  email: z.string().email("Digite um email válido"),
-  phone: z.string().optional(),
-  document: z.string().min(1, "Documento é obrigatório"),
-  planId: z.string().optional(),
-  graduationId: z.string().optional(),
-  status: z.enum(["active", "inactive"]),
-});
-
-type EditStudentFormData = z.infer<typeof editStudentSchema>;
+import {
+  EditStudentFormData,
+  editStudentSchema,
+} from "@/modules/students/schemas/edit-student.schema";
 
 interface EditStudentProps {
   student: StudentEntity;
