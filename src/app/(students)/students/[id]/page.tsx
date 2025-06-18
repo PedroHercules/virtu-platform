@@ -1,9 +1,7 @@
 import { EditStudent } from "@/modules/students/edit-student";
-import {
-  getStudentById,
-  getPlans,
-  getGraduations,
-} from "@/modules/students/services/students-service";
+import { getGraduationsService } from "@/services/graduation/get-graduations.service";
+import { getPlansService } from "@/services/plans/get-plans.service";
+import { getStudentByIdService } from "@/services/students/get-student-by-id.service";
 import { notFound } from "next/navigation";
 
 interface StudentDetailsPageProps {
@@ -17,9 +15,9 @@ export default async function StudentDetailsPage({
 }: StudentDetailsPageProps) {
   // Busca os dados no servidor
   const [student, plans, graduations] = await Promise.all([
-    getStudentById(params.id),
-    getPlans(),
-    getGraduations(),
+    getStudentByIdService(params.id),
+    getPlansService(),
+    getGraduationsService(),
   ]);
 
   // Se o estudante não foi encontrado, mostra página 404

@@ -25,6 +25,8 @@ export interface StudentEntity {
   active: boolean;
   graduationId?: string;
   planId?: string;
+  activeTime?: number;
+  inactiveTime?: number;
   createdAt: Date;
   updatedAt: Date;
   Subscription?: StudentSubscriptionEntity[];

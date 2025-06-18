@@ -28,13 +28,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import SelectInput from "@/components/ui/select-input";
-import { Student } from "./mock/students-data";
-import { Graduation } from "./mock/graduations-data";
 import { useRouter } from "next/navigation";
 import { studentsRoutes } from "@/routes/students";
 import { LoadingModal } from "@/components/ui/loading-modal";
 import { ErrorModal } from "@/components/ui/error-modal";
 import { StudentsSuccessModal } from "./components/success-modal";
+import { GraduationEntity, StudentEntity } from "@/services/students/students";
+import { PlanEntity } from "@/services/plans/plan";
 
 // Schema de validação
 const editStudentSchema = z.object({
@@ -50,9 +50,9 @@ const editStudentSchema = z.object({
 type EditStudentFormData = z.infer<typeof editStudentSchema>;
 
 interface EditStudentProps {
-  student: Student;
-  plans: { id: string; name: string; monthlyFee: number }[];
-  graduations: Graduation[];
+  student: StudentEntity;
+  plans: PlanEntity[];
+  graduations: GraduationEntity[];
 }
 
 export const EditStudent: React.FC<EditStudentProps> = ({
@@ -76,17 +76,17 @@ export const EditStudent: React.FC<EditStudentProps> = ({
       name: student.name,
       email: student.email,
       phone: "", // Não temos phone nos dados mock
-      document: student.document,
-      planId: student.plan.id,
-      graduationId: undefined, // Não temos graduationId nos dados mock
-      status: student.status,
+      document: "",
+      planId: student.Subscription?.[0]?.planId,
+      graduationId: student.StudentGraduation?.[0]?.graduationId, // Não temos graduationId nos dados mock
+      status: student.active ? "active" : "inactive",
     },
   });
 
   // Opções de planos com informações detalhadas
   const planOptions = plans.map((plan) => ({
     value: plan.id,
-    label: `${plan.name} - R$ ${plan.monthlyFee.toFixed(2)}/mês`,
+    label: `${plan.name} - R$ ${plan.price.toFixed(2)}/mês`,
   }));
 
   // Opções de graduações ordenadas por nível
@@ -225,11 +225,11 @@ export const EditStudent: React.FC<EditStudentProps> = ({
       form.reset({
         name: student.name,
         email: student.email,
-        phone: "",
-        document: student.document,
-        planId: student.plan.id,
-        graduationId: undefined,
-        status: student.status,
+        phone: "", // Não temos phone nos dados mock
+        document: "",
+        planId: student.Subscription?.[0]?.planId,
+        graduationId: student.StudentGraduation?.[0]?.graduationId,
+        status: student.active ? "active" : "inactive",
       });
     }
     setIsEditing(!isEditing);
@@ -256,12 +256,12 @@ export const EditStudent: React.FC<EditStudentProps> = ({
               </h1>
               <div
                 className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  student.status === "active"
+                  student.active
                     ? "bg-success/20 text-success border border-success/30"
                     : "bg-destructive/20 text-destructive border border-destructive/30"
                 }`}
               >
-                {student.status === "active" ? "Ativo" : "Inativo"}
+                {student.active ? "Ativo" : "Inativo"}
               </div>
             </div>
             <p className="text-foreground/60 font-medium">
@@ -580,13 +580,13 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                 <div>
                   <p className="text-sm text-foreground/60">Nome do Plano</p>
                   <p className="font-semibold text-foreground">
-                    {student.plan.name}
+                    {student.Subscription?.[0]?.Plan?.name || "Nenhum plano"}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-foreground/60">Valor Mensal</p>
                   <p className="font-semibold text-accent text-lg">
-                    R$ {student.plan.monthlyFee.toFixed(2)}
+                    R$ {student.Subscription?.[0]?.Plan?.price.toFixed(2)}
                   </p>
                 </div>
                 <div>
@@ -594,7 +594,9 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                     Próximo Vencimento
                   </p>
                   <p className="font-semibold text-foreground">
-                    {getExpirationDate(student.createdAt)}
+                    {getExpirationDate(
+                      new Date(student.createdAt).toISOString()
+                    )}
                   </p>
                 </div>
               </div>
@@ -613,7 +615,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                       Data de Cadastro
                     </p>
                     <p className="font-semibold text-foreground text-sm">
-                      {formatDate(student.createdAt)}
+                      {formatDate(new Date(student.createdAt).toISOString())}
                     </p>
                   </div>
                   <div>
@@ -622,7 +624,9 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                     </p>
                     <p className="font-semibold text-foreground flex items-center gap-2 text-sm">
                       <Clock size={14} className="text-accent" />
-                      {getTimeSinceRegistration(student.createdAt)}
+                      {getTimeSinceRegistration(
+                        new Date(student.createdAt).toISOString()
+                      )}
                     </p>
                   </div>
                 </div>
@@ -630,13 +634,13 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                   <div>
                     <p className="text-sm text-foreground/60">Tempo Ativo</p>
                     <p className="font-semibold text-foreground flex items-center gap-2 text-sm">
-                      {student.activeTime}
+                      {student.activeTime || "N/A"}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-foreground/60">Tempo Inativo</p>
                     <p className="font-semibold text-foreground flex items-center gap-2 text-sm">
-                      {student.inactiveTime}
+                      {student.inactiveTime || "N/A"}
                     </p>
                   </div>
                 </div>
