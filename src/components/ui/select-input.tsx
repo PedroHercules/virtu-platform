@@ -48,7 +48,7 @@ export interface SelectInputProps {
   /**
    * Altura do trigger (default: h-12)
    */
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   /**
    * Variante visual do select
    */
@@ -59,6 +59,7 @@ const sizeClasses = {
   sm: "h-9 text-sm",
   md: "h-10 text-sm",
   lg: "h-12 text-sm",
+  xl: "h-14 text-base",
 };
 
 const variantClasses = {

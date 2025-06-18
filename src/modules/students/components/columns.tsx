@@ -5,19 +5,22 @@ import { Edit, Trash, UserCheck, UserX } from "lucide-react";
 import { ActionDropdown, ActionItem } from "@/components/ui/action-dropdown";
 import { DataTableColumn } from "@/components/ui/data-table";
 import { useRouter } from "next/navigation";
-import { Student } from "../mock/students-data";
 import { studentsRoutes } from "@/routes";
+import { StudentEntity } from "@/services/students/students";
 
 // Props para as ações das colunas
 interface ColumnActionsProps {
-  onUpdateStatus: (student: Student, status: "active" | "inactive") => void;
-  onDelete: (student: Student) => void;
+  onUpdateStatus: (
+    student: StudentEntity,
+    status: "active" | "inactive"
+  ) => void;
+  onDelete: (student: StudentEntity) => void;
 }
 
 export const useStudentsColumns = ({
   onUpdateStatus,
   onDelete,
-}: ColumnActionsProps): DataTableColumn<Student>[] => {
+}: ColumnActionsProps): DataTableColumn<StudentEntity>[] => {
   const router = useRouter();
 
   return [
@@ -45,33 +48,28 @@ export const useStudentsColumns = ({
       ),
     },
     {
-      key: "document",
-      title: "Documento",
-      render: (value) => (
-        <span className="text-muted-foreground">{String(value)}</span>
-      ),
-    },
-    {
-      key: "plan",
+      key: "Subscription",
       title: "Plano",
       sortable: true,
       render: (value, student) => (
-        <span className="font-semibold">{student.plan.name}</span>
+        <span className="font-semibold">
+          {student.Subscription?.[0]?.Plan?.name || "-"}
+        </span>
       ),
     },
     {
-      key: "status",
+      key: "active",
       title: "Status",
       sortable: true,
       render: (value, student) => (
         <span
           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-            student.status === "active"
+            student.active
               ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
               : "bg-orange-500/10 text-orange-600 border border-orange-500/20"
           }`}
         >
-          {student.status === "active" ? "Ativo" : "Inativo"}
+          {student.active ? "Ativo" : "Inativo"}
         </span>
       ),
     },
@@ -90,7 +88,7 @@ export const useStudentsColumns = ({
       ),
     },
     {
-      key: "actions" as keyof Student,
+      key: "actions" as keyof StudentEntity,
       title: "",
       width: 48,
       render: (_, student) => {
@@ -104,7 +102,7 @@ export const useStudentsColumns = ({
             label: "Ativar",
             icon: <UserCheck size={16} />,
             onClick: () => onUpdateStatus(student, "active"),
-            disabled: student.status === "active",
+            disabled: student.active,
             className: "text-emerald-600",
             separator: true,
           },
@@ -112,7 +110,7 @@ export const useStudentsColumns = ({
             label: "Inativar",
             icon: <UserX size={16} />,
             onClick: () => onUpdateStatus(student, "inactive"),
-            disabled: student.status === "inactive",
+            disabled: student.active === false,
             className: "text-orange-600",
           },
           {
@@ -129,6 +127,3 @@ export const useStudentsColumns = ({
     },
   ];
 };
-
-// Re-exportar o tipo Student do mock para facilitar importações
-export type { Student } from "../mock/students-data";

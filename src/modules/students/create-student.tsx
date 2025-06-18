@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   ArrowLeft,
   User,
@@ -22,27 +21,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import SelectInput from "@/components/ui/select-input";
-import { Graduation } from "./mock/graduations-data";
 import { useRouter } from "next/navigation";
 import { studentsRoutes } from "@/routes/students";
 import { LoadingModal } from "@/components/ui/loading-modal";
 import { ErrorModal } from "@/components/ui/error-modal";
 import { StudentsSuccessModal } from "./components/success-modal";
-
-// Schema de validação atualizado
-const createStudentSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  email: z.string().email("Digite um email válido"),
-  phone: z.string().optional(),
-  planId: z.string().optional(),
-  graduationId: z.string().optional(),
-});
-
-type CreateStudentFormData = z.infer<typeof createStudentSchema>;
+import { createStudentService } from "@/services/students/create-student.service";
+import {
+  CreateStudentFormData,
+  createStudentSchema,
+} from "@/modules/students/schemas/create-student.schema";
+import { PlanEntity } from "@/services/plans/plan";
+import { GraduationEntity } from "@/services/graduation/graduation";
 
 interface CreateStudentProps {
-  plans: { id: string; name: string; monthlyFee: number }[];
-  graduations: Graduation[];
+  plans: PlanEntity[];
+  graduations: GraduationEntity[];
 }
 
 export const CreateStudent: React.FC<CreateStudentProps> = ({
@@ -72,7 +66,7 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
   // Opções de planos com informações detalhadas
   const planOptions = plans.map((plan) => ({
     value: plan.id,
-    label: `${plan.name} - R$ ${plan.monthlyFee.toFixed(2)}/mês`,
+    label: `${plan.name} - R$ ${plan.price.toFixed(2)}/mês`,
   }));
 
   // Opções de graduações ordenadas por nível
@@ -101,17 +95,8 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
     setIsSubmitting(true);
 
     try {
-      // Simular chamada de API
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Simular erro aleatório para demonstração
-      if (Math.random() > 0.7) {
-        throw new Error("Email já está em uso por outro aluno");
-      }
-
-      console.log("Dados do aluno:", data);
-
-      // Mostrar modal de sucesso
+      await createStudentService(data);
+      form.reset();
       setShowSuccessModal(true);
     } catch (error) {
       const errorMessage =
@@ -276,7 +261,7 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
                               }}
                               options={planOptions}
                               placeholder="Selecione o plano (opcional)"
-                              size="lg"
+                              size="xl"
                             />
                           </FormControl>
                           <FormMessage />
@@ -304,7 +289,7 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
                               }}
                               options={graduationOptions}
                               placeholder="Selecione a graduação (opcional)"
-                              size="lg"
+                              size="xl"
                             />
                           </FormControl>
                           <FormMessage />

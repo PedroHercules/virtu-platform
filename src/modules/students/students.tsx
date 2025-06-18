@@ -2,14 +2,18 @@
 
 import * as React from "react";
 import { PlusCircle, Search, CheckCircle, XCircle, Trash } from "lucide-react";
-import { Student } from "./mock/students-data";
 import SelectInput from "@/components/ui/select-input";
 import { Input } from "@/components/ui/input";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable, DataTableColumn } from "@/components/ui/data-table";
 import { useStudentsColumns } from "./components/columns";
 import { studentsRoutes } from "@/routes/students";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
+import {
+  StudentEntity,
+  StudentPaginatedResponse,
+} from "@/services/students/students";
+import { PlanEntity } from "@/services/plans/plan";
 
 type FiltersFormData = {
   searchTerm: string;
@@ -18,8 +22,8 @@ type FiltersFormData = {
 };
 
 interface StudentsProps {
-  students: Student[];
-  plans: { id: string; name: string; monthlyFee: number }[];
+  students: StudentPaginatedResponse;
+  plans: PlanEntity[];
 }
 
 export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
@@ -37,10 +41,12 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
 
   // Observar os valores do formulário para filtrar em tempo real
   const watchedValues = watch();
-  const { searchTerm, statusFilter, planFilter } = watchedValues;
+  const { searchTerm, planFilter } = watchedValues;
 
   // Estado para seleção em lote
-  const [selectedStudents, setSelectedStudents] = React.useState<Student[]>([]);
+  const [selectedStudents, setSelectedStudents] = React.useState<
+    StudentEntity[]
+  >([]);
 
   // Opções para os selects
   const statusOptions = [
@@ -56,26 +62,21 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
 
   // Filtrar alunos baseado nos valores do formulário
   const filteredStudents = React.useMemo(() => {
-    return students.filter((student) => {
+    return students.data.filter((student) => {
       const matchesSearch =
         !searchTerm ||
         searchTerm === "" ||
         student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.document.toLowerCase().includes(searchTerm.toLowerCase());
+        student.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === "all" || student.status === statusFilter;
+      const matchesPlan = planFilter === "all" || student.planId === planFilter;
 
-      const matchesPlan =
-        planFilter === "all" || student.plan.id === planFilter;
-
-      return matchesSearch && matchesStatus && matchesPlan;
+      return matchesSearch && matchesPlan;
     });
-  }, [students, searchTerm, statusFilter, planFilter]);
+  }, [students, searchTerm, planFilter]);
 
   // Handlers
-  const handleDeleteStudent = (student: Student) => {
+  const handleDeleteStudent = (student: StudentEntity) => {
     // TODO: Implementar deleção individual
     console.log("Deletar aluno:", student.id);
     setSelectedStudents((prev) => prev.filter((s) => s.id !== student.id));
@@ -91,7 +92,7 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
   };
 
   const handleUpdateStudentStatus = (
-    student: Student,
+    student: StudentEntity,
     newStatus: "active" | "inactive"
   ) => {
     // TODO: Implementar atualização de status individual
@@ -209,10 +210,14 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
 
       {/* Tabela de Alunos */}
       <DataTable
-        data={filteredStudents}
-        columns={columns}
+        data={filteredStudents as unknown as Record<string, unknown>[]}
+        columns={
+          columns as unknown as DataTableColumn<Record<string, unknown>>[]
+        }
         onRowClick={(student) =>
-          router.push(studentsRoutes.editStudent(student.id))
+          router.push(
+            studentsRoutes.editStudent((student as unknown as StudentEntity).id)
+          )
         }
         pagination={{
           enabled: true,
@@ -224,9 +229,13 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
         }}
         selection={{
           enabled: true,
-          selectedItems: selectedStudents,
-          onSelectionChange: setSelectedStudents,
-          getItemId: (student) => student.id,
+          selectedItems: selectedStudents as unknown as Record<
+            string,
+            unknown
+          >[],
+          onSelectionChange: (items) =>
+            setSelectedStudents(items as unknown as StudentEntity[]),
+          getItemId: (student) => (student as unknown as StudentEntity).id,
         }}
         emptyMessage="Nenhum aluno encontrado"
       />
