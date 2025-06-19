@@ -160,7 +160,7 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
                 className="space-y-8"
               >
                 {/* Primeira linha: Nome e Email */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Nome */}
                   <div>
                     <FormField
@@ -200,6 +200,31 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
                             <input
                               {...field}
                               type="email"
+                              placeholder="Digite o email do aluno"
+                              className="h-14 w-full rounded-xl border border-border/30 bg-input px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Documento */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="document"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground font-semibold flex items-center gap-2 text-base">
+                            <Mail size={18} className="text-accent" />
+                            Documento *
+                          </FormLabel>
+                          <FormControl>
+                            <input
+                              {...field}
+                              type="document"
                               placeholder="Digite o email do aluno"
                               className="h-14 w-full rounded-xl border border-border/30 bg-input px-4 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 placeholder:text-muted-foreground"
                             />

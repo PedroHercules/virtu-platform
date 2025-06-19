@@ -3,6 +3,11 @@ import { z } from "zod";
 export const createStudentSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   email: z.string().email("Digite um email válido"),
+  document: z
+    .string({
+      required_error: "Documento é obrigatório",
+    })
+    .min(1, "Documento é obrigatório"),
   phone: z
     .string({
       required_error: "Telefone é obrigatório",
