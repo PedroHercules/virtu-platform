@@ -439,89 +439,79 @@ export function DataTable<T extends Record<string, unknown>>({
       </Table>
 
       {/* Paginação */}
-      {pagination.enabled &&
-        paginationInfo &&
-        paginationInfo.totalPages > 1 && (
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center space-x-6 lg:space-x-8">
-              {pagination.showPageSizeSelector && (
-                <div className="flex items-center space-x-2">
-                  <p className="text-sm font-medium">Itens por página</p>
-                  <Select
-                    value={paginationInfo.pageSize.toString()}
-                    onValueChange={(value) =>
-                      handlePageSizeChange(Number(value))
-                    }
-                  >
-                    <SelectTrigger className="h-8 w-[70px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent side="top">
-                      {(pagination.pageSizeOptions || [10, 20, 30, 40, 50]).map(
-                        (size) => (
-                          <SelectItem key={size} value={size.toString()}>
-                            {size}
-                          </SelectItem>
-                        )
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              {pagination.showTotal && (
-                <div className="text-sm text-muted-foreground">
-                  Mostrando {paginationInfo.startItem} a{" "}
-                  {paginationInfo.endItem} de {paginationInfo.totalItems}{" "}
-                  resultados
-                </div>
-              )}
+      {pagination.enabled && paginationInfo && (
+        <div className="flex items-center justify-between px-2">
+          <div className="flex items-center space-x-6 lg:space-x-8">
+            {pagination.showPageSizeSelector && (
+              <div className="flex items-center space-x-2">
+                <p className="text-sm font-medium">Itens por página</p>
+                <Select
+                  value={paginationInfo.pageSize.toString()}
+                  onValueChange={(value) => handlePageSizeChange(Number(value))}
+                >
+                  <SelectTrigger className="h-8 w-[70px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent side="top">
+                    {(pagination.pageSizeOptions || [10, 20, 30, 40, 50]).map(
+                      (size) => (
+                        <SelectItem key={size} value={size.toString()}>
+                          {size}
+                        </SelectItem>
+                      )
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            {pagination.showTotal && (
+              <div className="text-sm text-muted-foreground">
+                Mostrando {paginationInfo.startItem} a {paginationInfo.endItem}{" "}
+                de {paginationInfo.totalItems} resultados
+              </div>
+            )}
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="text-sm font-medium">
+              Página {paginationInfo.currentPage} de {paginationInfo.totalPages}
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="text-sm font-medium">
-                Página {paginationInfo.currentPage} de{" "}
-                {paginationInfo.totalPages}
-              </div>
-              <div className="flex items-center space-x-1">
-                <button
-                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
-                  onClick={() => handlePageChange(1)}
-                  disabled={paginationInfo.currentPage === 1}
-                >
-                  <ChevronsLeft className="h-4 w-4" />
-                </button>
-                <button
-                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
-                  onClick={() =>
-                    handlePageChange(paginationInfo.currentPage - 1)
-                  }
-                  disabled={paginationInfo.currentPage === 1}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
-                  onClick={() =>
-                    handlePageChange(paginationInfo.currentPage + 1)
-                  }
-                  disabled={
-                    paginationInfo.currentPage === paginationInfo.totalPages
-                  }
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-                <button
-                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
-                  onClick={() => handlePageChange(paginationInfo.totalPages)}
-                  disabled={
-                    paginationInfo.currentPage === paginationInfo.totalPages
-                  }
-                >
-                  <ChevronsRight className="h-4 w-4" />
-                </button>
-              </div>
+            <div className="flex items-center space-x-1">
+              <button
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
+                onClick={() => handlePageChange(1)}
+                disabled={paginationInfo.currentPage === 1}
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </button>
+              <button
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
+                onClick={() => handlePageChange(paginationInfo.currentPage - 1)}
+                disabled={paginationInfo.currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
+                onClick={() => handlePageChange(paginationInfo.currentPage + 1)}
+                disabled={
+                  paginationInfo.currentPage === paginationInfo.totalPages
+                }
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+              <button
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0"
+                onClick={() => handlePageChange(paginationInfo.totalPages)}
+                disabled={
+                  paginationInfo.currentPage === paginationInfo.totalPages
+                }
+              >
+                <ChevronsRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 }
