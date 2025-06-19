@@ -30,7 +30,7 @@ export async function getStudentsService(
     searchParams.append("pageSize", filters.limit.toString());
   }
 
-  if (filters.search) {
+  if (filters.search && filters.search.trim() !== "") {
     searchParams.append("searchTerm", filters.search);
   }
 
@@ -43,6 +43,9 @@ export async function getStudentsService(
   }
 
   const url = `/students${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
-  const data = await makeApiRequest(url, session.user?.token as string);
+
+  const data = await makeApiRequest(url, session.user?.token as string, {
+    method: "GET",
+  });
   return data;
 }

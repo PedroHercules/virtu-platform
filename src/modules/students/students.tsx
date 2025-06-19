@@ -42,10 +42,18 @@ export const Students: React.FC<StudentsProps> = ({
   const router = useRouter();
 
   // Hook reutilizável para filtros do servidor
-  const { updateFilters, debouncedSearch, updatePage, updatePageSize } =
-    useServerFilters<typeof currentFilters>({
-      basePath: "/students",
-    });
+  const {
+    updateFilters,
+    debouncedSearch,
+    updatePage,
+    updatePageSize,
+    clearFilters,
+    isPending,
+  } = useServerFilters<typeof currentFilters>({
+    basePath: "/students",
+    debounceDelay: 300,
+    optimistic: true,
+  });
 
   const filtersForm = useForm<FiltersFormData>({
     defaultValues: {
@@ -134,55 +142,81 @@ export const Students: React.FC<StudentsProps> = ({
       </div>
 
       {/* Filtros usando React Hook Form */}
-      <form className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="md:col-span-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/60 z-10" />
-            <Input
-              {...register("searchTerm")}
-              type="text"
-              placeholder="Buscar por nome, email ou documento..."
-              inputSize="md"
-              className="pl-10 text-md"
-              onChange={(e) => debouncedSearch(e.target.value)}
-            />
+      <div className="space-y-4">
+        <form className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="md:col-span-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/60 z-10" />
+              <Input
+                {...register("searchTerm")}
+                type="text"
+                placeholder="Buscar por nome, email ou documento..."
+                inputSize="md"
+                className="pl-10 text-md"
+                onChange={(e) => debouncedSearch(e.target.value)}
+              />
+            </div>
           </div>
-        </div>
 
-        <Controller
-          name="statusFilter"
-          control={control}
-          render={({ field }) => (
-            <SelectInput
-              value={field.value}
-              onValueChange={(value) => {
-                field.onChange(value);
-                updateFilters({
-                  status: value as "all" | "active" | "inactive",
+          <Controller
+            name="statusFilter"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                value={field.value}
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  updateFilters({
+                    status: value as "all" | "active" | "inactive",
+                  });
+                }}
+                options={statusOptions}
+                placeholder="Filtrar por status"
+                disabled={isPending}
+              />
+            )}
+          />
+
+          <Controller
+            name="planFilter"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                value={field.value}
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  updateFilters({ planId: value });
+                }}
+                options={planOptions}
+                placeholder="Filtrar por plano"
+                disabled={isPending}
+              />
+            )}
+          />
+        </form>
+
+        {/* Botão para limpar filtros */}
+        {(currentFilters.search ||
+          currentFilters.status !== "all" ||
+          currentFilters.planId !== "all") && (
+          <div className="flex justify-end">
+            <button
+              onClick={() => {
+                clearFilters();
+                filtersForm.reset({
+                  searchTerm: "",
+                  statusFilter: "all",
+                  planFilter: "all",
                 });
               }}
-              options={statusOptions}
-              placeholder="Filtrar por status"
-            />
-          )}
-        />
-
-        <Controller
-          name="planFilter"
-          control={control}
-          render={({ field }) => (
-            <SelectInput
-              value={field.value}
-              onValueChange={(value) => {
-                field.onChange(value);
-                updateFilters({ planId: value });
-              }}
-              options={planOptions}
-              placeholder="Filtrar por plano"
-            />
-          )}
-        />
-      </form>
+              disabled={isPending}
+              className="text-sm text-foreground/60 hover:text-foreground underline transition-colors"
+            >
+              Limpar filtros
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Ações em Lote */}
       {selectedStudents.length > 0 && (
@@ -222,6 +256,7 @@ export const Students: React.FC<StudentsProps> = ({
         columns={
           columns as unknown as DataTableColumn<Record<string, unknown>>[]
         }
+        loading={isPending}
         onRowClick={(student) =>
           router.push(
             studentsRoutes.editStudent((student as unknown as StudentEntity).id)
