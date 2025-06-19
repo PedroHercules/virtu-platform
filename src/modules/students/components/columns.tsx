@@ -58,18 +58,18 @@ export const useStudentsColumns = ({
       ),
     },
     {
-      key: "active",
+      key: "status",
       title: "Status",
       sortable: true,
       render: (value, student) => (
         <span
           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-            student.active
+            student.status === "active"
               ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
               : "bg-orange-500/10 text-orange-600 border border-orange-500/20"
           }`}
         >
-          {student.active ? "Ativo" : "Inativo"}
+          {student.status === "active" ? "Ativo" : "Inativo"}
         </span>
       ),
     },
@@ -102,7 +102,7 @@ export const useStudentsColumns = ({
             label: "Ativar",
             icon: <UserCheck size={16} />,
             onClick: () => onUpdateStatus(student, "active"),
-            disabled: student.active,
+            disabled: student.status === "active",
             className: "text-emerald-600",
             separator: true,
           },
@@ -110,7 +110,7 @@ export const useStudentsColumns = ({
             label: "Inativar",
             icon: <UserX size={16} />,
             onClick: () => onUpdateStatus(student, "inactive"),
-            disabled: student.active === false,
+            disabled: student.status === "inactive",
             className: "text-orange-600",
           },
           {

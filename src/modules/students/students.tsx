@@ -14,6 +14,7 @@ import {
   StudentPaginatedResponse,
 } from "@/services/students/students";
 import { PlanEntity } from "@/services/plans/plan";
+import { useServerFilters } from "@/hooks/use-server-filters";
 
 type FiltersFormData = {
   searchTerm: string;
@@ -24,24 +25,37 @@ type FiltersFormData = {
 interface StudentsProps {
   students: StudentPaginatedResponse;
   plans: PlanEntity[];
+  currentFilters: {
+    page: number;
+    limit: number;
+    search: string;
+    status: "all" | "active" | "inactive";
+    planId: string;
+  };
 }
 
-export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
+export const Students: React.FC<StudentsProps> = ({
+  students,
+  plans,
+  currentFilters,
+}) => {
   const router = useRouter();
+
+  // Hook reutilizável para filtros do servidor
+  const { updateFilters, debouncedSearch, updatePage, updatePageSize } =
+    useServerFilters<typeof currentFilters>({
+      basePath: "/students",
+    });
 
   const filtersForm = useForm<FiltersFormData>({
     defaultValues: {
-      searchTerm: "",
-      statusFilter: "all",
-      planFilter: "all",
+      searchTerm: currentFilters.search,
+      statusFilter: currentFilters.status,
+      planFilter: currentFilters.planId,
     },
   });
 
-  const { register, control, watch } = filtersForm;
-
-  // Observar os valores do formulário para filtrar em tempo real
-  const watchedValues = watch();
-  const { searchTerm, planFilter } = watchedValues;
+  const { register, control } = filtersForm;
 
   // Estado para seleção em lote
   const [selectedStudents, setSelectedStudents] = React.useState<
@@ -59,21 +73,6 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
     { value: "all", label: "Todos os planos" },
     ...plans.map((plan) => ({ value: plan.id, label: plan.name })),
   ];
-
-  // Filtrar alunos baseado nos valores do formulário
-  const filteredStudents = React.useMemo(() => {
-    return students.data.filter((student) => {
-      const matchesSearch =
-        !searchTerm ||
-        searchTerm === "" ||
-        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesPlan = planFilter === "all" || student.planId === planFilter;
-
-      return matchesSearch && matchesPlan;
-    });
-  }, [students, searchTerm, planFilter]);
 
   // Handlers
   const handleDeleteStudent = (student: StudentEntity) => {
@@ -145,6 +144,7 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
               placeholder="Buscar por nome, email ou documento..."
               inputSize="md"
               className="pl-10 text-md"
+              onChange={(e) => debouncedSearch(e.target.value)}
             />
           </div>
         </div>
@@ -155,7 +155,12 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
           render={({ field }) => (
             <SelectInput
               value={field.value}
-              onValueChange={field.onChange}
+              onValueChange={(value) => {
+                field.onChange(value);
+                updateFilters({
+                  status: value as "all" | "active" | "inactive",
+                });
+              }}
               options={statusOptions}
               placeholder="Filtrar por status"
             />
@@ -168,7 +173,10 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
           render={({ field }) => (
             <SelectInput
               value={field.value}
-              onValueChange={field.onChange}
+              onValueChange={(value) => {
+                field.onChange(value);
+                updateFilters({ planId: value });
+              }}
               options={planOptions}
               placeholder="Filtrar por plano"
             />
@@ -210,7 +218,7 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
 
       {/* Tabela de Alunos */}
       <DataTable
-        data={filteredStudents as unknown as Record<string, unknown>[]}
+        data={students.data as unknown as Record<string, unknown>[]}
         columns={
           columns as unknown as DataTableColumn<Record<string, unknown>>[]
         }
@@ -221,11 +229,16 @@ export const Students: React.FC<StudentsProps> = ({ students, plans }) => {
         }
         pagination={{
           enabled: true,
-          type: "local",
-          pageSize: 10,
+          type: "server",
+          currentPage: currentFilters.page,
+          pageSize: currentFilters.limit,
+          totalItems: students.totalItems,
+          totalPages: students.totalPages,
           pageSizeOptions: [5, 10, 20, 50],
           showTotal: true,
           showPageSizeSelector: true,
+          onPageChange: updatePage,
+          onPageSizeChange: updatePageSize,
         }}
         selection={{
           enabled: true,
