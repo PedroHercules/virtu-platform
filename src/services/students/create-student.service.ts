@@ -9,11 +9,5 @@ export async function createStudentService(
     body: JSON.stringify(data),
   });
 
-  if (!response.id) {
-    const errorMessage =
-      response?.message || "Um erro ocorreu ao criar o aluno";
-    throw new Error(errorMessage);
-  }
-
   return response;
 }

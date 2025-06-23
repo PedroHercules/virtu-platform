@@ -38,7 +38,7 @@ import {
   EditStudentFormData,
   editStudentSchema,
 } from "@/modules/students/schemas/edit-student.schema";
-import { updateStudentService } from "@/services/students/update-student.service";
+import { updateStudentAction } from "./actions";
 
 interface EditStudentProps {
   student: StudentEntity;
@@ -166,7 +166,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
     setIsSubmitting(true);
 
     try {
-      await updateStudentService(student.id, {
+      await updateStudentAction(student.id, {
         ...data,
       });
       form.reset();

@@ -5,17 +5,21 @@ import { getStudentByIdService } from "@/services/students/get-student-by-id.ser
 import { notFound } from "next/navigation";
 
 interface StudentDetailsPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function StudentDetailsPage({
   params,
 }: StudentDetailsPageProps) {
   // Busca os dados no servidor
+  const { id } = await params;
   const [student, plans, graduations] = await Promise.all([
-    getStudentByIdService(params.id),
+    getStudentByIdService(id),
     getPlansService(),
     getGraduationsService(),
   ]);
