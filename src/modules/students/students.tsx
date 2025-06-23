@@ -8,7 +8,7 @@ import { DataTable, DataTableColumn } from "@/components/ui/data-table";
 import { useStudentsColumns } from "./components/columns";
 import { studentsRoutes } from "@/routes/students";
 import { useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   StudentEntity,
   StudentPaginatedResponse,
@@ -16,7 +16,7 @@ import {
 import { PlanEntity } from "@/services/plans/plan";
 import { FiltersFormData } from "@/modules/students/schemas/students-filters.schema";
 import { getStudentsAction } from "./actions";
-import { useDebounce } from "@/hooks/use-debounce";
+import { useServerFilters } from "@/hooks/use-server-filters";
 
 interface StudentsProps {
   students: StudentPaginatedResponse;
@@ -42,15 +42,11 @@ export const Students: React.FC<StudentsProps> = ({
   currentFilters,
 }) => {
   const router = useRouter();
-
-  const [studentsData, setStudentsData] =
-    React.useState<StudentPaginatedResponse>(initialStudents);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [searchInput, setSearchInput] = React.useState(currentFilters.search);
   const [selectedStudents, setSelectedStudents] = React.useState<
     StudentEntity[]
   >([]);
 
+  // Formulário específico para filtros de estudantes
   const filtersForm = useForm<FiltersFormData>({
     defaultValues: {
       searchTerm: currentFilters.search,
@@ -59,50 +55,35 @@ export const Students: React.FC<StudentsProps> = ({
     },
   });
 
-  const { control, watch } = filtersForm;
-  const formValues = watch();
-
-  const fetchStudents = React.useCallback(
-    async (filters: {
-      pageNumber?: number;
-      pageSize?: number;
-      searchTerm?: string;
-      status?: "all" | "active" | "inactive";
-      planId?: string;
-    }) => {
-      setIsLoading(true);
-      try {
-        const response = await getStudentsAction({
-          pageNumber: filters.pageNumber || 1,
-          pageSize: filters.pageSize || studentsData.itemsPerPage,
-          searchTerm: filters.searchTerm || "",
-          status: filters.status || "all",
-          planId: filters.planId === "all" ? undefined : filters.planId,
-        });
-
-        if (response.success) {
-          setStudentsData(response.data as StudentPaginatedResponse);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [studentsData.itemsPerPage]
-  );
-
-  const { isPending: searchPending, handleChange } = useDebounce(
-    async (searchTerm: string) => {
-      filtersForm.setValue("searchTerm", searchTerm);
-
-      await fetchStudents({
-        pageNumber: 1,
-        pageSize: studentsData.itemsPerPage,
-        searchTerm,
-        status: formValues.status,
-        planId: formValues.planId,
+  // Usando o hook genérico de filtros e paginação
+  const {
+    data: studentsData,
+    isLoading,
+    searchInput,
+    isFiltered,
+    handleSearchChange,
+    handlePageChange,
+    handlePageSizeChange,
+    updateFilters,
+    clearFilters,
+  } = useServerFilters<StudentEntity, FiltersFormData>({
+    initialData: initialStudents,
+    initialFilters: currentFilters,
+    filtersForm,
+    fetchAction: async (filters) => {
+      const response = await getStudentsAction({
+        pageNumber: filters.pageNumber as number,
+        pageSize: filters.pageSize as number,
+        searchTerm: filters.searchTerm as string,
+        status: filters.status as "all" | "active" | "inactive",
+        planId:
+          filters.planId === "all" ? undefined : (filters.planId as string),
       });
-    }
-  );
+      return response;
+    },
+  });
+
+  const { control } = filtersForm;
 
   const planOptions = [
     { value: "all", label: "Todos os planos" },
@@ -138,60 +119,6 @@ export const Students: React.FC<StudentsProps> = ({
     );
     setSelectedStudents([]);
   };
-
-  const handleChangePage = async (page: number) => {
-    await fetchStudents({
-      pageNumber: page,
-      pageSize: studentsData.itemsPerPage,
-      searchTerm: formValues.searchTerm,
-      status: formValues.status,
-      planId: formValues.planId,
-    });
-  };
-
-  const handleUpdatePageSize = async (pageSize: number) => {
-    await fetchStudents({
-      pageNumber: 1,
-      pageSize,
-      searchTerm: formValues.searchTerm,
-      status: formValues.status,
-      planId: formValues.planId,
-    });
-  };
-
-  const updateFilters = async (newFilters: Partial<FiltersFormData>) => {
-    await fetchStudents({
-      pageNumber: 1,
-      pageSize: studentsData.itemsPerPage,
-      searchTerm: formValues.searchTerm,
-      status: newFilters.status || formValues.status,
-      planId: newFilters.planId || formValues.planId,
-    });
-  };
-
-  const clearFilters = async () => {
-    setSearchInput("");
-    filtersForm.reset({
-      searchTerm: "",
-      status: "all",
-      planId: "all",
-    });
-
-    await fetchStudents({
-      pageNumber: 1,
-      pageSize: studentsData.itemsPerPage,
-      searchTerm: "",
-      status: "all",
-      planId: "all",
-    });
-  };
-
-  const isFiltered =
-    formValues.searchTerm ||
-    formValues.status !== "all" ||
-    formValues.planId !== "all";
-
-  const totalLoading = isLoading || searchPending;
 
   // Configuração das colunas usando o hook
   const columns = useStudentsColumns({
@@ -229,10 +156,7 @@ export const Students: React.FC<StudentsProps> = ({
                 placeholder="Buscar por nome, email ou documento..."
                 inputSize="md"
                 className="pl-10 text-md"
-                onChange={(e) => {
-                  setSearchInput(e.target.value);
-                  handleChange(e.target.value);
-                }}
+                onChange={(e) => handleSearchChange(e.target.value)}
               />
             </div>
           </div>
@@ -242,16 +166,16 @@ export const Students: React.FC<StudentsProps> = ({
             control={control}
             render={({ field }) => (
               <SelectInput
-                value={field.value}
+                value={field.value as string}
                 onValueChange={(value) => {
                   field.onChange(value);
                   updateFilters({
-                    status: value as "all" | "active" | "inactive",
+                    status: value,
                   });
                 }}
                 options={statusOptions}
                 placeholder="Filtrar por status"
-                disabled={totalLoading}
+                disabled={isLoading}
               />
             )}
           />
@@ -261,14 +185,14 @@ export const Students: React.FC<StudentsProps> = ({
             control={control}
             render={({ field }) => (
               <SelectInput
-                value={field.value}
+                value={field.value as string}
                 onValueChange={(value) => {
                   field.onChange(value);
                   updateFilters({ planId: value });
                 }}
                 options={planOptions}
                 placeholder="Filtrar por plano"
-                disabled={totalLoading}
+                disabled={isLoading}
               />
             )}
           />
@@ -286,7 +210,7 @@ export const Students: React.FC<StudentsProps> = ({
                   planId: "all",
                 });
               }}
-              disabled={totalLoading}
+              disabled={isLoading}
               className="text-sm text-foreground/60 hover:text-foreground underline transition-colors"
             >
               Limpar filtros
@@ -333,7 +257,7 @@ export const Students: React.FC<StudentsProps> = ({
         columns={
           columns as unknown as DataTableColumn<Record<string, unknown>>[]
         }
-        loading={totalLoading}
+        loading={isLoading}
         onRowClick={(student) =>
           router.push(
             studentsRoutes.editStudent((student as unknown as StudentEntity).id)
@@ -349,8 +273,8 @@ export const Students: React.FC<StudentsProps> = ({
           pageSizeOptions: [5, 10, 20, 50],
           showTotal: true,
           showPageSizeSelector: true,
-          onPageChange: handleChangePage,
-          onPageSizeChange: handleUpdatePageSize,
+          onPageChange: handlePageChange,
+          onPageSizeChange: handlePageSizeChange,
         }}
         selection={{
           enabled: true,

@@ -1,148 +1,211 @@
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useRef, useTransition } from "react";
+import { useState, useCallback } from "react";
+import { UseFormReturn, FieldValues } from "react-hook-form";
+import { useDebounce } from "./use-debounce";
 
-interface UseServerFiltersConfig {
-  basePath: string;
-  resetPageOnFilter?: boolean;
+interface PaginatedResponse<T> {
+  data: T[];
+  totalItems: number;
+  currentPage: number;
+  totalPages: number;
+  itemsPerPage: number;
+  nextPage: number | null;
+  previousPage: number | null;
+}
+
+interface UseServerFiltersOptions<TData, TFilters extends FieldValues> {
+  initialData: PaginatedResponse<TData>;
+  initialFilters: {
+    page: number;
+    limit: number;
+    search: string;
+  };
+  fetchAction: (filters: Record<string, unknown>) => Promise<{
+    success: boolean;
+    data?: PaginatedResponse<TData>;
+    error?: string;
+  }>;
+  filtersForm: UseFormReturn<TFilters>;
+  searchFieldName?: string;
   debounceDelay?: number;
-  optimistic?: boolean;
 }
 
 export function useServerFilters<
-  T extends Record<string, string | number | undefined> & {
-    page?: number;
-    limit?: number;
-  },
->(config: UseServerFiltersConfig) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  const {
-    basePath,
-    resetPageOnFilter = true,
-    debounceDelay = 300,
-    optimistic = true,
-  } = config;
+  TData,
+  TFilters extends FieldValues = FieldValues,
+>({
+  initialData,
+  initialFilters,
+  fetchAction,
+  filtersForm,
+  searchFieldName = "searchTerm",
+  debounceDelay = 500,
+}: UseServerFiltersOptions<TData, TFilters>) {
+  const [data, setData] = useState<PaginatedResponse<TData>>(initialData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchInput, setSearchInput] = useState(initialFilters.search);
+
+  const { watch } = filtersForm;
+  const formValues = watch();
+
+  const fetchData = useCallback(
+    async (
+      filters: Record<string, unknown> & {
+        pageNumber?: number;
+        pageSize?: number;
+      }
+    ) => {
+      setIsLoading(true);
+      try {
+        const response = await fetchAction({
+          pageNumber: filters.pageNumber || 1,
+          pageSize: filters.pageSize || data.itemsPerPage,
+          [searchFieldName]: filters[searchFieldName] || "",
+          ...Object.keys(formValues).reduce(
+            (acc, key) => {
+              if (key !== searchFieldName) {
+                acc[key] = filters[key] || formValues[key];
+              }
+              return acc;
+            },
+            {} as Record<string, unknown>
+          ),
+        });
+
+        if (response.success && response.data) {
+          setData(response.data);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [fetchAction, data.itemsPerPage, formValues, searchFieldName]
+  );
+
+  const { isPending: searchPending, handleChange } = useDebounce(
+    async (searchTerm: string) => {
+      (filtersForm.setValue as (name: string, value: unknown) => void)(
+        searchFieldName,
+        searchTerm
+      );
+
+      await fetchData({
+        pageNumber: 1,
+        pageSize: data.itemsPerPage,
+        [searchFieldName]: searchTerm,
+      });
+    },
+    debounceDelay
+  );
+
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchInput(value);
+      handleChange(value);
+    },
+    [handleChange]
+  );
+
+  const handlePageChange = useCallback(
+    async (page: number) => {
+      await fetchData({
+        pageNumber: page,
+        pageSize: data.itemsPerPage,
+        [searchFieldName]: formValues[searchFieldName],
+      });
+    },
+    [fetchData, data.itemsPerPage, formValues, searchFieldName]
+  );
+
+  const handlePageSizeChange = useCallback(
+    async (pageSize: number) => {
+      await fetchData({
+        pageNumber: 1,
+        pageSize,
+        [searchFieldName]: formValues[searchFieldName],
+      });
+    },
+    [fetchData, formValues, searchFieldName]
+  );
 
   const updateFilters = useCallback(
-    (newFilters: Partial<T>, options?: { immediate?: boolean }) => {
-      const params = new URLSearchParams(searchParams);
-
-      // Aplicar novos filtros
-      Object.entries(newFilters).forEach(([key, value]) => {
-        if (value && value !== "all" && value !== "") {
-          params.set(key, value.toString());
-        } else {
-          params.delete(key);
-        }
+    async (newFilters: Record<string, unknown>) => {
+      await fetchData({
+        pageNumber: 1,
+        pageSize: data.itemsPerPage,
+        [searchFieldName]: formValues[searchFieldName],
+        ...newFilters,
       });
-
-      // Reset página quando filtros mudam (exceto paginação)
-      if (resetPageOnFilter && !options?.immediate) {
-        const hasFilterChange = Object.keys(newFilters).some(
-          (key) => key !== "page" && key !== "limit"
-        );
-
-        if (hasFilterChange) {
-          params.delete("page");
-        }
-      }
-
-      const newUrl = `${basePath}?${params.toString()}`;
-
-      // Usar transição para otimizar re-renders
-      if (optimistic) {
-        startTransition(() => {
-          router.replace(newUrl);
-        });
-      } else {
-        router.push(newUrl);
-      }
     },
-    [router, searchParams, basePath, resetPageOnFilter, optimistic]
+    [fetchData, data.itemsPerPage, formValues, searchFieldName]
   );
 
-  const debouncedSearch = useCallback(
-    (value: string, filterKey = "search") => {
-      // Clear timeout anterior
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
+  const clearFilters = useCallback(async () => {
+    setSearchInput("");
+    const resetValues = {
+      ...Object.keys(formValues).reduce(
+        (acc, key) => {
+          if (key === searchFieldName) {
+            acc[key] = "";
+          } else if (typeof formValues[key] === "string") {
+            acc[key] = "all";
+          } else {
+            acc[key] = formValues[key];
+          }
+          return acc;
+        },
+        {} as Record<string, unknown>
+      ),
+    };
 
-      // Se valor vazio, aplicar imediatamente
-      if (!value || value.trim() === "") {
-        updateFilters({ [filterKey]: "" } as Partial<T>);
-        return;
-      }
+    (filtersForm.reset as (values?: Record<string, unknown>) => void)(
+      resetValues
+    );
 
-      // Debounce para valores não vazios
-      debounceRef.current = setTimeout(() => {
-        updateFilters({ [filterKey]: value } as Partial<T>);
-      }, debounceDelay);
-    },
-    [updateFilters, debounceDelay]
-  );
+    await fetchData({
+      pageNumber: 1,
+      pageSize: data.itemsPerPage,
+      [searchFieldName]: "",
+      ...Object.keys(resetValues).reduce(
+        (acc, key) => {
+          if (key !== searchFieldName) {
+            acc[key] = resetValues[key];
+          }
+          return acc;
+        },
+        {} as Record<string, unknown>
+      ),
+    });
+  }, [filtersForm, formValues, fetchData, data.itemsPerPage, searchFieldName]);
 
-  const updatePage = useCallback(
-    (page: number) => {
-      updateFilters({ page } as Partial<T>, { immediate: true });
-    },
-    [updateFilters]
-  );
-
-  const updatePageSize = useCallback(
-    (limit: number) => {
-      updateFilters({ limit, page: 1 } as Partial<T>);
-    },
-    [updateFilters]
-  );
-
-  const clearFilters = useCallback(() => {
-    const params = new URLSearchParams();
-    // Manter apenas limit se existir
-    const currentLimit = searchParams.get("limit");
-    if (currentLimit) {
-      params.set("limit", currentLimit);
+  const isFiltered = Object.keys(formValues).some((key) => {
+    const value = formValues[key];
+    if (key === searchFieldName) {
+      return Boolean(value);
     }
+    return value !== "all" && Boolean(value);
+  });
 
-    if (optimistic) {
-      startTransition(() => {
-        const newUrl = params.toString()
-          ? `${basePath}?${params.toString()}`
-          : basePath;
-        router.replace(newUrl);
-      });
-    } else {
-      const newUrl = params.toString()
-        ? `${basePath}?${params.toString()}`
-        : basePath;
-      router.push(newUrl);
-    }
-  }, [router, searchParams, basePath, optimistic]);
-
-  const getCurrentFilters = useCallback((): Partial<T> => {
-    const filters: Record<string, string | number> = {};
-
-    for (const [key, value] of searchParams.entries()) {
-      // Convert numeric values
-      if (key === "page" || key === "limit") {
-        filters[key] = parseInt(value);
-      } else {
-        filters[key] = value;
-      }
-    }
-
-    return filters as Partial<T>;
-  }, [searchParams]);
+  const totalLoading = isLoading || searchPending;
 
   return {
+    // Data
+    data,
+    isLoading: totalLoading,
+
+    // Form
+    filtersForm,
+    formValues,
+    searchInput,
+    isFiltered,
+
+    // Handlers
+    handleSearchChange,
+    handlePageChange,
+    handlePageSizeChange,
     updateFilters,
-    debouncedSearch,
-    updatePage,
-    updatePageSize,
     clearFilters,
-    getCurrentFilters,
-    isPending,
+
+    // Utils
+    fetchData,
   };
 }
