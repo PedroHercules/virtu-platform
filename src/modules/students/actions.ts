@@ -1,8 +1,9 @@
 "use server";
 
 import { studentsRoutes } from "@/routes";
+import { createStudentService } from "@/services/students/create-student.service";
 import { getStudentsService } from "@/services/students/get-students.service";
-import { StudentsFiltersDTO } from "@/services/students/students";
+import { StudentDTO, StudentsFiltersDTO } from "@/services/students/students";
 import { invalidate } from "@/utils/revalidate";
 
 export async function getStudentsAction(filters: StudentsFiltersDTO) {
@@ -20,6 +21,29 @@ export async function getStudentsAction(filters: StudentsFiltersDTO) {
     return {
       success: false,
       error: "Erro ao obter alunos. Tente novamente mais tarde.",
+    };
+  }
+}
+
+export async function createStudentAction(data: StudentDTO) {
+  try {
+    const student = await createStudentService(data);
+
+    invalidate(studentsRoutes.students);
+
+    return {
+      success: true,
+      data: student,
+      message: "Aluno criado com sucesso.",
+    };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Erro ao criar aluno. Tente novamente mais tarde.";
+    return {
+      success: false,
+      error: errorMessage,
     };
   }
 }

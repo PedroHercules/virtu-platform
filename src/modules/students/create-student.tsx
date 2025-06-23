@@ -26,13 +26,13 @@ import { studentsRoutes } from "@/routes/students";
 import { LoadingModal } from "@/components/ui/loading-modal";
 import { ErrorModal } from "@/components/ui/error-modal";
 import { StudentsSuccessModal } from "./components/success-modal";
-import { createStudentService } from "@/services/students/create-student.service";
 import {
   CreateStudentFormData,
   createStudentSchema,
 } from "@/modules/students/schemas/create-student.schema";
 import { PlanEntity } from "@/services/plans/plan";
 import { GraduationEntity } from "@/services/graduation/graduation";
+import { createStudentAction } from "./actions";
 
 interface CreateStudentProps {
   plans: PlanEntity[];
@@ -95,7 +95,10 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
     setIsSubmitting(true);
 
     try {
-      await createStudentService(data);
+      const response = await createStudentAction(data);
+      if (!response.success) {
+        throw new Error(response.error || "Erro ao criar aluno");
+      }
       form.reset();
       setShowSuccessModal(true);
     } catch (error) {

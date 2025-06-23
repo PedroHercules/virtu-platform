@@ -1,15 +1,19 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
+import { getServerSession } from "next-auth";
+
 const API_BASE_URL = process.env.BACKEND_URL;
 
 export async function makeApiRequest(
   endpoint: string,
-  token: string,
   options: RequestInit = {}
 ) {
+  const session = await getServerSession(authOptions);
+
   const url = `${API_BASE_URL}${endpoint}`;
 
   const headers = {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${session?.user?.token}`,
     ...options.headers,
   };
 
