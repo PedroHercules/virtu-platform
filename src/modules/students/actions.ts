@@ -29,8 +29,6 @@ export async function createStudentAction(data: StudentDTO) {
   try {
     const student = await createStudentService(data);
 
-    invalidate(studentsRoutes.students);
-
     return {
       success: true,
       data: student,
