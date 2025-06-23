@@ -169,7 +169,6 @@ export const EditStudent: React.FC<EditStudentProps> = ({
       await updateStudentAction(student.id, {
         ...data,
       });
-      form.reset();
       setIsEditing(false);
       setShowSuccessModal(true);
     } catch (error) {
