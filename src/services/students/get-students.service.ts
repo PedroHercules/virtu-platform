@@ -1,18 +1,10 @@
-import { StudentPaginatedResponse } from "./students";
+import { StudentPaginatedResponse, StudentsFiltersDTO } from "./students";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
 import { makeApiRequest } from "@/lib/api-client";
 
-interface StudentsFilters {
-  page?: number;
-  limit?: number;
-  search?: string;
-  status?: "all" | "active" | "inactive";
-  planId?: string;
-}
-
 export async function getStudentsService(
-  filters: StudentsFilters = {}
+  filters: StudentsFiltersDTO = {}
 ): Promise<StudentPaginatedResponse> {
   const session = await getServerSession(authOptions);
 
@@ -22,16 +14,16 @@ export async function getStudentsService(
 
   const searchParams = new URLSearchParams();
 
-  if (filters.page) {
-    searchParams.append("pageNumber", filters.page.toString());
+  if (filters.pageNumber) {
+    searchParams.append("pageNumber", filters.pageNumber.toString());
   }
 
-  if (filters.limit) {
-    searchParams.append("pageSize", filters.limit.toString());
+  if (filters.pageSize) {
+    searchParams.append("pageSize", filters.pageSize.toString());
   }
 
-  if (filters.search && filters.search.trim() !== "") {
-    searchParams.append("searchTerm", filters.search);
+  if (filters.searchTerm && filters.searchTerm.trim() !== "") {
+    searchParams.append("searchTerm", filters.searchTerm);
   }
 
   if (filters.status && filters.status !== "all") {
@@ -47,5 +39,6 @@ export async function getStudentsService(
   const data = await makeApiRequest(url, session.user?.token as string, {
     method: "GET",
   });
+
   return data;
 }

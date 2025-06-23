@@ -14,13 +14,9 @@ import {
   StudentPaginatedResponse,
 } from "@/services/students/students";
 import { PlanEntity } from "@/services/plans/plan";
-import { useServerFilters } from "@/hooks/use-server-filters";
-
-type FiltersFormData = {
-  searchTerm: string;
-  statusFilter: "all" | "active" | "inactive";
-  planFilter: string;
-};
+import { FiltersFormData } from "@/modules/students/schemas/students-filters.schema";
+import { getStudentsAction } from "./actions";
+import { useDebounce } from "@/hooks/use-debounce";
 
 interface StudentsProps {
   students: StudentPaginatedResponse;
@@ -34,63 +30,91 @@ interface StudentsProps {
   };
 }
 
+const statusOptions = [
+  { value: "all", label: "Todos os status" },
+  { value: "active", label: "Ativo" },
+  { value: "inactive", label: "Inativo" },
+];
+
 export const Students: React.FC<StudentsProps> = ({
-  students,
+  students: initialStudents,
   plans,
   currentFilters,
 }) => {
   const router = useRouter();
 
-  // Hook reutilizável para filtros do servidor
-  const {
-    updateFilters,
-    debouncedSearch,
-    updatePage,
-    updatePageSize,
-    clearFilters,
-    isPending,
-  } = useServerFilters<typeof currentFilters>({
-    basePath: "/students",
-    debounceDelay: 300,
-    optimistic: true,
-  });
-
-  const filtersForm = useForm<FiltersFormData>({
-    defaultValues: {
-      searchTerm: currentFilters.search,
-      statusFilter: currentFilters.status,
-      planFilter: currentFilters.planId,
-    },
-  });
-
-  const { register, control } = filtersForm;
-
-  // Estado para seleção em lote
+  const [studentsData, setStudentsData] =
+    React.useState<StudentPaginatedResponse>(initialStudents);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [searchInput, setSearchInput] = React.useState(currentFilters.search);
   const [selectedStudents, setSelectedStudents] = React.useState<
     StudentEntity[]
   >([]);
 
-  // Opções para os selects
-  const statusOptions = [
-    { value: "all", label: "Todos os status" },
-    { value: "active", label: "Ativo" },
-    { value: "inactive", label: "Inativo" },
-  ];
+  const filtersForm = useForm<FiltersFormData>({
+    defaultValues: {
+      searchTerm: currentFilters.search,
+      status: currentFilters.status,
+      planId: currentFilters.planId,
+    },
+  });
+
+  const { control, watch } = filtersForm;
+  const formValues = watch();
+
+  const fetchStudents = React.useCallback(
+    async (filters: {
+      pageNumber?: number;
+      pageSize?: number;
+      searchTerm?: string;
+      status?: "all" | "active" | "inactive";
+      planId?: string;
+    }) => {
+      setIsLoading(true);
+      try {
+        const response = await getStudentsAction({
+          pageNumber: filters.pageNumber || 1,
+          pageSize: filters.pageSize || studentsData.itemsPerPage,
+          searchTerm: filters.searchTerm || "",
+          status: filters.status || "all",
+          planId: filters.planId === "all" ? undefined : filters.planId,
+        });
+
+        if (response.success) {
+          setStudentsData(response.data as StudentPaginatedResponse);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [studentsData.itemsPerPage]
+  );
+
+  const { isPending: searchPending, handleChange } = useDebounce(
+    async (searchTerm: string) => {
+      filtersForm.setValue("searchTerm", searchTerm);
+
+      await fetchStudents({
+        pageNumber: 1,
+        pageSize: studentsData.itemsPerPage,
+        searchTerm,
+        status: formValues.status,
+        planId: formValues.planId,
+      });
+    }
+  );
 
   const planOptions = [
     { value: "all", label: "Todos os planos" },
     ...plans.map((plan) => ({ value: plan.id, label: plan.name })),
   ];
 
-  // Handlers
   const handleDeleteStudent = (student: StudentEntity) => {
-    // TODO: Implementar deleção individual
     console.log("Deletar aluno:", student.id);
     setSelectedStudents((prev) => prev.filter((s) => s.id !== student.id));
   };
 
   const handleDeleteSelected = () => {
-    // TODO: Implementar deleção em lote
     console.log(
       "Deletar alunos:",
       selectedStudents.map((s) => s.id)
@@ -102,12 +126,10 @@ export const Students: React.FC<StudentsProps> = ({
     student: StudentEntity,
     newStatus: "active" | "inactive"
   ) => {
-    // TODO: Implementar atualização de status individual
     console.log("Atualizar status do aluno:", student.id, "para", newStatus);
   };
 
   const handleUpdateStatusBatch = (newStatus: "active" | "inactive") => {
-    // TODO: Implementar atualização de status em lote
     console.log(
       "Atualizar status dos alunos:",
       selectedStudents.map((s) => s.id),
@@ -116,6 +138,60 @@ export const Students: React.FC<StudentsProps> = ({
     );
     setSelectedStudents([]);
   };
+
+  const handleChangePage = async (page: number) => {
+    await fetchStudents({
+      pageNumber: page,
+      pageSize: studentsData.itemsPerPage,
+      searchTerm: formValues.searchTerm,
+      status: formValues.status,
+      planId: formValues.planId,
+    });
+  };
+
+  const handleUpdatePageSize = async (pageSize: number) => {
+    await fetchStudents({
+      pageNumber: 1,
+      pageSize,
+      searchTerm: formValues.searchTerm,
+      status: formValues.status,
+      planId: formValues.planId,
+    });
+  };
+
+  const updateFilters = async (newFilters: Partial<FiltersFormData>) => {
+    await fetchStudents({
+      pageNumber: 1,
+      pageSize: studentsData.itemsPerPage,
+      searchTerm: formValues.searchTerm,
+      status: newFilters.status || formValues.status,
+      planId: newFilters.planId || formValues.planId,
+    });
+  };
+
+  const clearFilters = async () => {
+    setSearchInput("");
+    filtersForm.reset({
+      searchTerm: "",
+      status: "all",
+      planId: "all",
+    });
+
+    await fetchStudents({
+      pageNumber: 1,
+      pageSize: studentsData.itemsPerPage,
+      searchTerm: "",
+      status: "all",
+      planId: "all",
+    });
+  };
+
+  const isFiltered =
+    formValues.searchTerm ||
+    formValues.status !== "all" ||
+    formValues.planId !== "all";
+
+  const totalLoading = isLoading || searchPending;
 
   // Configuração das colunas usando o hook
   const columns = useStudentsColumns({
@@ -148,18 +224,21 @@ export const Students: React.FC<StudentsProps> = ({
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/60 z-10" />
               <Input
-                {...register("searchTerm")}
+                value={searchInput}
                 type="text"
                 placeholder="Buscar por nome, email ou documento..."
                 inputSize="md"
                 className="pl-10 text-md"
-                onChange={(e) => debouncedSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearchInput(e.target.value);
+                  handleChange(e.target.value);
+                }}
               />
             </div>
           </div>
 
           <Controller
-            name="statusFilter"
+            name="status"
             control={control}
             render={({ field }) => (
               <SelectInput
@@ -172,13 +251,13 @@ export const Students: React.FC<StudentsProps> = ({
                 }}
                 options={statusOptions}
                 placeholder="Filtrar por status"
-                disabled={isPending}
+                disabled={totalLoading}
               />
             )}
           />
 
           <Controller
-            name="planFilter"
+            name="planId"
             control={control}
             render={({ field }) => (
               <SelectInput
@@ -189,27 +268,25 @@ export const Students: React.FC<StudentsProps> = ({
                 }}
                 options={planOptions}
                 placeholder="Filtrar por plano"
-                disabled={isPending}
+                disabled={totalLoading}
               />
             )}
           />
         </form>
 
         {/* Botão para limpar filtros */}
-        {(currentFilters.search ||
-          currentFilters.status !== "all" ||
-          currentFilters.planId !== "all") && (
+        {isFiltered && (
           <div className="flex justify-end">
             <button
               onClick={() => {
                 clearFilters();
                 filtersForm.reset({
                   searchTerm: "",
-                  statusFilter: "all",
-                  planFilter: "all",
+                  status: "all",
+                  planId: "all",
                 });
               }}
-              disabled={isPending}
+              disabled={totalLoading}
               className="text-sm text-foreground/60 hover:text-foreground underline transition-colors"
             >
               Limpar filtros
@@ -252,11 +329,11 @@ export const Students: React.FC<StudentsProps> = ({
 
       {/* Tabela de Alunos */}
       <DataTable
-        data={students.data as unknown as Record<string, unknown>[]}
+        data={studentsData.data as unknown as Record<string, unknown>[]}
         columns={
           columns as unknown as DataTableColumn<Record<string, unknown>>[]
         }
-        loading={isPending}
+        loading={totalLoading}
         onRowClick={(student) =>
           router.push(
             studentsRoutes.editStudent((student as unknown as StudentEntity).id)
@@ -265,15 +342,15 @@ export const Students: React.FC<StudentsProps> = ({
         pagination={{
           enabled: true,
           type: "server",
-          currentPage: currentFilters.page,
-          pageSize: currentFilters.limit,
-          totalItems: students.totalItems,
-          totalPages: students.totalPages,
+          currentPage: studentsData.currentPage,
+          pageSize: studentsData.itemsPerPage,
+          totalItems: studentsData.totalItems,
+          totalPages: studentsData.totalPages,
           pageSizeOptions: [5, 10, 20, 50],
           showTotal: true,
           showPageSizeSelector: true,
-          onPageChange: updatePage,
-          onPageSizeChange: updatePageSize,
+          onPageChange: handleChangePage,
+          onPageSizeChange: handleUpdatePageSize,
         }}
         selection={{
           enabled: true,

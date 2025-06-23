@@ -35,6 +35,14 @@ export interface StudentEntity {
   StudentGraduation?: StudentGraduationEntity[];
 }
 
+export interface StudentsFiltersDTO {
+  pageNumber?: number;
+  pageSize?: number;
+  searchTerm?: string;
+  status?: "all" | "active" | "inactive";
+  planId?: string;
+}
+
 interface StudentPlanEntity {
   id: string;
   name: string;
