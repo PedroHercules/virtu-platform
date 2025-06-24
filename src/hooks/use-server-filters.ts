@@ -185,6 +185,29 @@ export function useServerFilters<
     return value !== "all" && Boolean(value);
   });
 
+  const refreshData = useCallback(async () => {
+    await fetchData({
+      pageNumber: data.currentPage,
+      pageSize: data.itemsPerPage,
+      [searchFieldName]: formValues[searchFieldName],
+      ...Object.keys(formValues).reduce(
+        (acc, key) => {
+          if (key !== searchFieldName) {
+            acc[key] = formValues[key];
+          }
+          return acc;
+        },
+        {} as Record<string, unknown>
+      ),
+    });
+  }, [
+    fetchData,
+    data.currentPage,
+    data.itemsPerPage,
+    formValues,
+    searchFieldName,
+  ]);
+
   const totalLoading = isLoading || searchPending;
 
   return {
@@ -204,6 +227,7 @@ export function useServerFilters<
     handlePageSizeChange,
     updateFilters,
     clearFilters,
+    refreshData,
 
     // Utils
     fetchData,

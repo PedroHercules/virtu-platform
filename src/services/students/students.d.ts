@@ -43,6 +43,11 @@ export interface StudentsFiltersDTO {
   planId?: string;
 }
 
+interface UpdateStudentStatusDTO {
+  studentsIds: string[];
+  status: "active" | "inactive";
+}
+
 interface StudentPlanEntity {
   id: string;
   name: string;
@@ -81,4 +86,9 @@ interface StudentGraduationEntity {
   createdAt: Date;
   updatedAt: Date;
   Graduation: GraduationEntity;
+}
+
+interface UpdateStudentStatusEntity {
+  status: "success" | "error";
+  count: number;
 }

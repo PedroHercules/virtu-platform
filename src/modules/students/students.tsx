@@ -15,19 +15,13 @@ import {
 } from "@/services/students/students";
 import { PlanEntity } from "@/services/plans/plan";
 import { FiltersFormData } from "@/modules/students/schemas/students-filters.schema";
-import { getStudentsAction } from "./actions";
+import { getStudentsAction, updateStudentStatusBatchAction } from "./actions";
 import { useServerFilters } from "@/hooks/use-server-filters";
+import { toast } from "sonner";
 
 interface StudentsProps {
   students: StudentPaginatedResponse;
   plans: PlanEntity[];
-  currentFilters: {
-    page: number;
-    limit: number;
-    search: string;
-    status: "all" | "active" | "inactive";
-    planId: string;
-  };
 }
 
 const statusOptions = [
@@ -39,7 +33,6 @@ const statusOptions = [
 export const Students: React.FC<StudentsProps> = ({
   students: initialStudents,
   plans,
-  currentFilters,
 }) => {
   const router = useRouter();
   const [selectedStudents, setSelectedStudents] = React.useState<
@@ -48,9 +41,9 @@ export const Students: React.FC<StudentsProps> = ({
 
   const filtersForm = useForm<FiltersFormData>({
     defaultValues: {
-      searchTerm: currentFilters.search,
-      status: currentFilters.status,
-      planId: currentFilters.planId,
+      searchTerm: "",
+      status: "all",
+      planId: "",
     },
   });
 
@@ -64,9 +57,14 @@ export const Students: React.FC<StudentsProps> = ({
     handlePageSizeChange,
     updateFilters,
     clearFilters,
+    refreshData,
   } = useServerFilters<StudentEntity, FiltersFormData>({
     initialData: initialStudents,
-    initialFilters: currentFilters,
+    initialFilters: {
+      page: initialStudents.currentPage,
+      limit: initialStudents.itemsPerPage,
+      search: "",
+    },
     filtersForm,
     fetchAction: async (filters) => {
       const response = await getStudentsAction({
@@ -105,17 +103,69 @@ export const Students: React.FC<StudentsProps> = ({
     student: StudentEntity,
     newStatus: "active" | "inactive"
   ) => {
-    console.log("Atualizar status do aluno:", student.id, "para", newStatus);
+    const isActivating = newStatus === "active";
+
+    const toastId = toast.loading(
+      `${isActivating ? "Ativando" : "Desativando"} ${student.name}...`
+    );
+
+    updateStudentStatusBatchAction({
+      studentsIds: [student.id],
+      status: newStatus,
+    })
+      .then(() => {
+        toast.dismiss(toastId);
+        const actionText = isActivating ? "ativado" : "desativado";
+
+        toast.success(`${student.name} ${actionText} com sucesso!`);
+        refreshData();
+      })
+      .catch(() => {
+        toast.dismiss(toastId);
+        toast.error(
+          `Erro ao ${isActivating ? "ativar" : "desativar"} ${student.name}. Tente novamente.`
+        );
+      });
   };
 
-  const handleUpdateStatusBatch = (newStatus: "active" | "inactive") => {
-    console.log(
-      "Atualizar status dos alunos:",
-      selectedStudents.map((s) => s.id),
-      "para",
-      newStatus
+  const handleUpdateStatusBatch = async (newStatus: "active" | "inactive") => {
+    const count = selectedStudents.length;
+    const isActivating = newStatus === "active";
+    const studentText = count === 1 ? "aluno" : "alunos";
+
+    const toastId = toast.loading(
+      `${isActivating ? "Ativando" : "Desativando"} ${count} ${studentText}...`
     );
-    setSelectedStudents([]);
+
+    try {
+      const response = await updateStudentStatusBatchAction({
+        studentsIds: selectedStudents.map((s) => s.id),
+        status: newStatus,
+      });
+
+      toast.dismiss(toastId);
+
+      const actionText = isActivating
+        ? response?.data?.count === 1
+          ? "ativado"
+          : "ativados"
+        : response?.data?.count === 1
+          ? "desativado"
+          : "desativados";
+
+      toast.success(
+        `${response?.data?.count} ${studentText} ${actionText} com sucesso!`
+      );
+
+      await refreshData();
+
+      setSelectedStudents([]);
+    } catch {
+      toast.dismiss(toastId);
+      toast.error(
+        `Erro ao ${isActivating ? "ativar" : "desativar"} ${studentText}. Tente novamente.`
+      );
+    }
   };
 
   // Configuração das colunas usando o hook
