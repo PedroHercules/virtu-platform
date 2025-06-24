@@ -46,7 +46,6 @@ export const Students: React.FC<StudentsProps> = ({
     StudentEntity[]
   >([]);
 
-  // Formulário específico para filtros de estudantes
   const filtersForm = useForm<FiltersFormData>({
     defaultValues: {
       searchTerm: currentFilters.search,
@@ -55,7 +54,6 @@ export const Students: React.FC<StudentsProps> = ({
     },
   });
 
-  // Usando o hook genérico de filtros e paginação
   const {
     data: studentsData,
     isLoading,
@@ -144,7 +142,6 @@ export const Students: React.FC<StudentsProps> = ({
         </button>
       </div>
 
-      {/* Filtros usando React Hook Form */}
       <div className="space-y-4">
         <form className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="md:col-span-2">
