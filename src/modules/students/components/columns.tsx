@@ -53,7 +53,7 @@ export const useStudentsColumns = ({
       sortable: true,
       render: (value, student) => (
         <span className="font-semibold">
-          {student.Subscription?.[0]?.Plan?.name || "-"}
+          {student?.Subscription?.[0]?.Plan?.name || "-"}
         </span>
       ),
     },
