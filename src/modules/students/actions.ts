@@ -11,6 +11,7 @@ import {
 } from "@/services/students/students";
 import { updateStudentService } from "@/services/students/update-student.service";
 import { updateStudentStatusBatchService } from "@/services/students/update-student-status.service";
+import { deleteStudentsInBatchService } from "@/services/students/delete-students.service";
 
 export async function getStudentsAction(filters: StudentsFiltersDTO) {
   try {
@@ -102,6 +103,36 @@ export async function updateStudentStatusBatchAction(
       error instanceof Error
         ? error.message
         : "Erro ao atualizar status dos alunos. Tente novamente mais tarde.";
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+export async function deleteStudentsInBatchAction(studentsIds: string[]) {
+  try {
+    const response = await deleteStudentsInBatchService(studentsIds);
+    if (response.status === "error") {
+      throw new Error(
+        `Erro ao deletar alunos. Tente novamente mais tarde.`
+      );
+    }
+
+    revalidatePath(studentsRoutes.students);
+    revalidateTag(studentsRoutes.students);
+
+    return {
+      success: true,
+      message: `Alunos deletados com sucesso.`,
+      data: response,
+    };
+  } catch (error) {
+    console.error("Erro ao deletar alunos:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Erro ao deletar alunos. Tente novamente mais tarde.";
     return {
       success: false,
       error: errorMessage,

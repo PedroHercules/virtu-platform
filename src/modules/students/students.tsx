@@ -15,7 +15,11 @@ import {
 } from "@/services/students/students";
 import { PlanEntity } from "@/services/plans/plan";
 import { FiltersFormData } from "@/modules/students/schemas/students-filters.schema";
-import { getStudentsAction, updateStudentStatusBatchAction } from "./actions";
+import {
+  deleteStudentsInBatchAction,
+  getStudentsAction,
+  updateStudentStatusBatchAction,
+} from "./actions";
 import { useServerFilters } from "@/hooks/use-server-filters";
 import { toast } from "sonner";
 
@@ -87,16 +91,28 @@ export const Students: React.FC<StudentsProps> = ({
   ];
 
   const handleDeleteStudent = (student: StudentEntity) => {
-    console.log("Deletar aluno:", student.id);
-    setSelectedStudents((prev) => prev.filter((s) => s.id !== student.id));
+    deleteStudentsInBatchAction([student.id]).then((response) => {
+      if (response.success) {
+        toast.success(response.message);
+        refreshData();
+      } else {
+        toast.error(response.message);
+      }
+    });
   };
 
   const handleDeleteSelected = () => {
-    console.log(
-      "Deletar alunos:",
-      selectedStudents.map((s) => s.id)
+    deleteStudentsInBatchAction(selectedStudents.map((s) => s.id)).then(
+      (response) => {
+        if (response.success) {
+          toast.success(response.message);
+          refreshData();
+          setSelectedStudents([]);
+        } else {
+          toast.error(response.message);
+        }
+      }
     );
-    setSelectedStudents([]);
   };
 
   const handleUpdateStudentStatus = (
