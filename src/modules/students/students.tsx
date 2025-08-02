@@ -2,6 +2,10 @@
 
 import * as React from "react";
 import { PlusCircle, Search, CheckCircle, XCircle, Trash } from "lucide-react";
+import {
+  ConfirmationModal,
+  ConfirmationAction,
+} from "./components/confirmation-modal";
 import SelectInput from "@/components/ui/select-input";
 import { Input } from "@/components/ui/input";
 import { DataTable, DataTableColumn } from "@/components/ui/data-table";
@@ -90,29 +94,64 @@ export const Students: React.FC<StudentsProps> = ({
     ...plans.map((plan) => ({ value: plan.id, label: plan.name })),
   ];
 
+  // Estados para controle dos modais de confirmação
+  const [confirmationModal, setConfirmationModal] = React.useState<{
+    open: boolean;
+    action: ConfirmationAction;
+    students: StudentEntity[];
+    title?: string;
+    description?: string;
+  }>({ open: false, action: "delete", students: [] });
+
+  const [isProcessing, setIsProcessing] = React.useState(false);
+
   const handleDeleteStudent = (student: StudentEntity) => {
-    deleteStudentsInBatchAction([student.id]).then((response) => {
-      if (response.success) {
-        toast.success(response.message);
-        refreshData();
-      } else {
-        toast.error(response.message);
-      }
+    setConfirmationModal({
+      open: true,
+      action: "delete",
+      students: [student],
+      title: `Excluir ${student.name}`,
+      description: `Tem certeza que deseja excluir o aluno ${student.name}? Esta ação não pode ser desfeita.`,
     });
   };
 
   const handleDeleteSelected = () => {
-    deleteStudentsInBatchAction(selectedStudents.map((s) => s.id)).then(
-      (response) => {
-        if (response.success) {
-          toast.success(response.message);
-          refreshData();
-          setSelectedStudents([]);
-        } else {
-          toast.error(response.message);
-        }
+    const count = selectedStudents.length;
+    const studentText = count === 1 ? "aluno" : "alunos";
+
+    setConfirmationModal({
+      open: true,
+      action: "delete",
+      students: selectedStudents,
+      title: `Excluir ${count} ${studentText}`,
+      description: `Tem certeza que deseja excluir ${count} ${studentText}? Esta ação não pode ser desfeita.`,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    const students = confirmationModal.students;
+    setIsProcessing(true);
+
+    try {
+      const response = await deleteStudentsInBatchAction(
+        students.map((s) => s.id)
+      );
+      setIsProcessing(false);
+      setConfirmationModal((prev) => ({ ...prev, open: false }));
+
+      if (response.success) {
+        toast.success(response.message);
+        refreshData();
+        setSelectedStudents([]);
+      } else {
+        toast.error(response.message);
       }
-    );
+    } catch (error: unknown) {
+      console.error("Erro ao excluir alunos:", error);
+      setIsProcessing(false);
+      setConfirmationModal((prev) => ({ ...prev, open: false }));
+      toast.error("Erro ao excluir alunos. Tente novamente.");
+    }
   };
 
   const handleUpdateStudentStatus = (
@@ -120,68 +159,77 @@ export const Students: React.FC<StudentsProps> = ({
     newStatus: "active" | "inactive"
   ) => {
     const isActivating = newStatus === "active";
+    const action = isActivating ? "activate" : "deactivate";
+    const actionText = isActivating ? "Ativar" : "Inativar";
 
-    const toastId = toast.loading(
-      `${isActivating ? "Ativando" : "Desativando"} ${student.name}...`
-    );
-
-    updateStudentStatusBatchAction({
-      studentsIds: [student.id],
-      status: newStatus,
-    })
-      .then(() => {
-        toast.dismiss(toastId);
-        const actionText = isActivating ? "ativado" : "desativado";
-
-        toast.success(`${student.name} ${actionText} com sucesso!`);
-        refreshData();
-      })
-      .catch(() => {
-        toast.dismiss(toastId);
-        toast.error(
-          `Erro ao ${isActivating ? "ativar" : "desativar"} ${student.name}. Tente novamente.`
-        );
-      });
+    setConfirmationModal({
+      open: true,
+      action: action as ConfirmationAction,
+      students: [student],
+      title: `${actionText} ${student.name}`,
+      description: `Tem certeza que deseja ${isActivating ? "ativar" : "inativar"} o aluno ${student.name}?`,
+    });
   };
 
-  const handleUpdateStatusBatch = async (newStatus: "active" | "inactive") => {
-    const count = selectedStudents.length;
+  const handleConfirmStatusUpdate = async () => {
+    const students = confirmationModal.students;
+    const action = confirmationModal.action;
+    const newStatus = action === "activate" ? "active" : "inactive";
     const isActivating = newStatus === "active";
-    const studentText = count === 1 ? "aluno" : "alunos";
 
-    const toastId = toast.loading(
-      `${isActivating ? "Ativando" : "Desativando"} ${count} ${studentText}...`
-    );
+    setIsProcessing(true);
 
     try {
-      const response = await updateStudentStatusBatchAction({
-        studentsIds: selectedStudents.map((s) => s.id),
+      await updateStudentStatusBatchAction({
+        studentsIds: students.map((s) => s.id),
         status: newStatus,
       });
 
-      toast.dismiss(toastId);
+      setIsProcessing(false);
+      setConfirmationModal((prev) => ({ ...prev, open: false }));
 
-      const actionText = isActivating
-        ? response?.data?.count === 1
-          ? "ativado"
-          : "ativados"
-        : response?.data?.count === 1
-          ? "desativado"
-          : "desativados";
+      const actionText = isActivating ? "ativado" : "desativado";
+      const count = students.length;
+      const studentText = count === 1 ? "aluno" : "alunos";
 
       toast.success(
-        `${response?.data?.count} ${studentText} ${actionText} com sucesso!`
+        count === 1
+          ? `${students[0].name} ${actionText} com sucesso!`
+          : `${count} ${studentText} ${count === 1 ? actionText : actionText + "s"} com sucesso!`
       );
 
-      await refreshData();
+      refreshData();
+      if (count > 1) {
+        setSelectedStudents([]);
+      }
+    } catch (error: unknown) {
+      console.error("Erro ao atualizar status dos alunos:", error);
+      setIsProcessing(false);
+      setConfirmationModal((prev) => ({ ...prev, open: false }));
 
-      setSelectedStudents([]);
-    } catch {
-      toast.dismiss(toastId);
+      const count = students.length;
+      const studentText = count === 1 ? "aluno" : "alunos";
+
       toast.error(
-        `Erro ao ${isActivating ? "ativar" : "desativar"} ${studentText}. Tente novamente.`
+        `Erro ao ${isActivating ? "ativar" : "inativar"} ${studentText}. Tente novamente.`
       );
     }
+  };
+
+  const handleUpdateStatusBatch = (newStatus: "active" | "inactive") => {
+    const count = selectedStudents.length;
+    const isActivating = newStatus === "active";
+    const action = isActivating ? "activate" : "deactivate";
+    const actionText = isActivating ? "Ativar" : "Inativar";
+    const studentText = count === 1 ? "aluno" : "alunos";
+
+    setConfirmationModal({
+      open: true,
+      action: action as ConfirmationAction,
+      students: selectedStudents,
+      title: `${actionText} ${count} ${studentText}`,
+      description: `Tem certeza que deseja ${isActivating ? "ativar" : "inativar"} ${count} ${studentText}?`,
+    });
   };
 
   // Configuração das colunas usando o hook
@@ -350,6 +398,27 @@ export const Students: React.FC<StudentsProps> = ({
           getItemId: (student) => (student as unknown as StudentEntity).id,
         }}
         emptyMessage="Nenhum aluno encontrado"
+      />
+
+      {/* Modal de Confirmação */}
+      <ConfirmationModal
+        open={confirmationModal.open}
+        onClose={() =>
+          setConfirmationModal((prev) => ({ ...prev, open: false }))
+        }
+        onConfirm={() => {
+          if (confirmationModal.action === "delete") {
+            handleConfirmDelete();
+          } else {
+            handleConfirmStatusUpdate();
+          }
+        }}
+        action={confirmationModal.action}
+        title={confirmationModal.title}
+        description={confirmationModal.description}
+        itemName="aluno"
+        loading={isProcessing}
+        count={confirmationModal.students.length}
       />
     </div>
   );

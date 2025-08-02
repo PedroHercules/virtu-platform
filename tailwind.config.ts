@@ -37,8 +37,8 @@ const config: Config = {
           foreground: "#ffffff",
         },
         warning: {
-          DEFAULT: "#E4A76B", // Laranja suave que harmoniza
-          hover: "#D1945A",
+          DEFAULT: "#D9834A", // Laranja mais escuro e menos amarelado
+          hover: "#C57239",
           foreground: "#ffffff",
         },
       },
