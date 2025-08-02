@@ -38,7 +38,7 @@ export const Sidebar = () => {
       name: "Graduações",
       path: graduationsRoutes.graduations,
       icon: GraduationCap,
-      disabled: true,
+      disabled: false,
     },
     {
       name: "Pagamentos",
