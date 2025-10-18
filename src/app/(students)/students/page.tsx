@@ -16,7 +16,7 @@ export default async function StudentsPage() {
 
   return (
     <React.Suspense>
-      <Students students={students} plans={plans} />
+      <Students students={students.data} plans={plans.data} />
     </React.Suspense>
   );
 }

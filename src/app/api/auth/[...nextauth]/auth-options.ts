@@ -35,11 +35,11 @@ export const authOptions: NextAuthOptions = {
           }
 
           const loginResponse: UserSession = {
-            id: user.id,
-            username: user.username,
-            token: user.token,
-            email: user.email,
-            expires: user.expiresIn,
+            id: user.data.id,
+            username: user.data.username,
+            token: user.data.token,
+            email: user.data.email,
+            expires: user.data.expiresIn,
           };
 
           return loginResponse;

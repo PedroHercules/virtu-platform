@@ -1,9 +1,10 @@
+import { Result } from "@/types/result";
 import { StudentPaginatedResponse, StudentsFiltersDTO } from "./students";
 import { makeApiRequest } from "@/lib/api-client";
 
 export async function getStudentsService(
   filters: StudentsFiltersDTO = {}
-): Promise<StudentPaginatedResponse> {
+): Promise<Result<StudentPaginatedResponse>> {
   const searchParams = new URLSearchParams();
 
   if (filters.pageNumber) {

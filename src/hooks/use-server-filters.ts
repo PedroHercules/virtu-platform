@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { UseFormReturn, FieldValues } from "react-hook-form";
 import { useDebounce } from "./use-debounce";
+import { Result } from "@/types/result";
 
 interface PaginatedResponse<T> {
   data: T[];
@@ -21,7 +22,7 @@ interface UseServerFiltersOptions<TData, TFilters extends FieldValues> {
   };
   fetchAction: (filters: Record<string, unknown>) => Promise<{
     success: boolean;
-    data?: PaginatedResponse<TData>;
+    data?: Result<PaginatedResponse<TData>>;
     error?: string;
   }>;
   filtersForm: UseFormReturn<TFilters>;
@@ -72,7 +73,7 @@ export function useServerFilters<
         });
 
         if (response.success && response.data) {
-          setData(response.data);
+          setData(response.data.data);
         }
       } finally {
         setIsLoading(false);

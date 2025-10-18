@@ -58,8 +58,8 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
       name: "",
       email: "",
       phone: "",
-      planId: undefined,
-      graduationId: undefined,
+      planId: "",
+      graduationId: "",
     },
   });
 
@@ -97,7 +97,7 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
     try {
       const response = await createStudentAction(data);
       if (!response.success) {
-        throw new Error(response.error || "Erro ao criar aluno");
+        throw new Error(response.message || "Erro ao criar aluno");
       }
       form.reset();
       setShowSuccessModal(true);
@@ -283,10 +283,8 @@ export const CreateStudent: React.FC<CreateStudentProps> = ({
                           </FormLabel>
                           <FormControl>
                             <SelectInput
-                              value={field.value || ""}
-                              onValueChange={(value) => {
-                                field.onChange(value || undefined);
-                              }}
+                              value={field.value}
+                              onValueChange={field.onChange}
                               options={planOptions}
                               placeholder="Selecione o plano (opcional)"
                               size="xl"

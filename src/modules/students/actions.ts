@@ -31,24 +31,9 @@ export async function getStudentsAction(filters: StudentsFiltersDTO) {
 }
 
 export async function createStudentAction(data: StudentDTO) {
-  try {
-    const student = await createStudentService(data);
+  const student = await createStudentService(data);
 
-    return {
-      success: true,
-      data: student,
-      message: "Aluno criado com sucesso.",
-    };
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "Erro ao criar aluno. Tente novamente mais tarde.";
-    return {
-      success: false,
-      error: errorMessage,
-    };
-  }
+  return student;
 }
 
 export async function updateStudentAction(
@@ -114,9 +99,7 @@ export async function deleteStudentsInBatchAction(studentsIds: string[]) {
   try {
     const response = await deleteStudentsInBatchService(studentsIds);
     if (response.status === "error") {
-      throw new Error(
-        `Erro ao deletar alunos. Tente novamente mais tarde.`
-      );
+      throw new Error(`Erro ao deletar alunos. Tente novamente mais tarde.`);
     }
 
     revalidatePath(studentsRoutes.students);

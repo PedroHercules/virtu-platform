@@ -9,5 +9,5 @@ export default async function CreateStudentPage() {
     getGraduationsService(),
   ]);
 
-  return <CreateStudent plans={plans} graduations={graduations} />;
+  return <CreateStudent plans={plans.data} graduations={graduations.data} />;
 }
