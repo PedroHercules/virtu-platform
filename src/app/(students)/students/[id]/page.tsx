@@ -25,11 +25,15 @@ export default async function StudentDetailsPage({
   ]);
 
   // Se o estudante não foi encontrado, mostra página 404
-  if (!student) {
+  if (!student.data) {
     notFound();
   }
 
   return (
-    <EditStudent student={student} plans={plans} graduations={graduations} />
+    <EditStudent
+      student={student.data}
+      plans={plans.data || []}
+      graduations={graduations.data || []}
+    />
   );
 }

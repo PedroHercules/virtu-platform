@@ -174,8 +174,8 @@ export const Students: React.FC<StudentsProps> = ({
   const handleConfirmStatusUpdate = async () => {
     const students = confirmationModal.students;
     const action = confirmationModal.action;
-    const newStatus = action === "activate" ? "active" : "inactive";
-    const isActivating = newStatus === "active";
+    const newStatus = action === "activate" ? "ACTIVE" : "INACTIVE";
+    const isActivating = newStatus === "ACTIVE";
 
     setIsProcessing(true);
 

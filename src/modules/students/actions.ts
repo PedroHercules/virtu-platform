@@ -12,113 +12,57 @@ import {
 import { updateStudentService } from "@/services/students/update-student.service";
 import { updateStudentStatusBatchService } from "@/services/students/update-student-status.service";
 import { deleteStudentsInBatchService } from "@/services/students/delete-students.service";
+import { logResult } from "@/lib/result-utils";
 
 export async function getStudentsAction(filters: StudentsFiltersDTO) {
-  try {
-    const students = await getStudentsService(filters);
-
-    return {
-      data: students,
-      success: true,
-    };
-  } catch (error) {
-    console.error("Erro ao obter alunos:", error);
-    return {
-      success: false,
-      error: "Erro ao obter alunos. Tente novamente mais tarde.",
-    };
-  }
+  const result = await getStudentsService(filters);
+  await logResult(result, "getStudentsAction");
+  return result;
 }
 
 export async function createStudentAction(data: StudentDTO) {
-  const student = await createStudentService(data);
-
-  return student;
+  const result = await createStudentService(data);
+  await logResult(result, "createStudentAction");
+  return result;
 }
 
 export async function updateStudentAction(
   id: string,
   data: Partial<StudentDTO>
 ) {
-  try {
-    const student = await updateStudentService(id, data);
+  const result = await updateStudentService(id, data);
 
+  if (result.success) {
     revalidatePath(studentsRoutes.editStudent(id));
     revalidateTag(studentsRoutes.editStudent(id));
-
-    return {
-      success: true,
-      data: student,
-      message: "Aluno atualizado com sucesso.",
-    };
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "Erro ao atualizar aluno. Tente novamente mais tarde.";
-    return {
-      success: false,
-      error: errorMessage,
-    };
   }
+
+  await logResult(result, "updateStudentAction");
+  return result;
 }
 
 export async function updateStudentStatusBatchAction(
   data: UpdateStudentStatusDTO
 ) {
-  try {
-    const response = await updateStudentStatusBatchService(data);
+  const result = await updateStudentStatusBatchService(data);
 
+  if (result.success) {
     revalidatePath(studentsRoutes.students);
     revalidateTag(studentsRoutes.students);
-
-    if (response.status === "error") {
-      throw new Error(
-        `Erro ao atualizar status dos alunos. Tente novamente mais tarde.`
-      );
-    }
-
-    return {
-      success: true,
-      message: `Status de ${response.count} alunos atualizado com sucesso.`,
-      data: response,
-    };
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "Erro ao atualizar status dos alunos. Tente novamente mais tarde.";
-    return {
-      success: false,
-      error: errorMessage,
-    };
   }
+
+  await logResult(result, "updateStudentStatusBatchAction");
+  return result;
 }
 
 export async function deleteStudentsInBatchAction(studentsIds: string[]) {
-  try {
-    const response = await deleteStudentsInBatchService(studentsIds);
-    if (response.status === "error") {
-      throw new Error(`Erro ao deletar alunos. Tente novamente mais tarde.`);
-    }
+  const result = await deleteStudentsInBatchService(studentsIds);
 
+  if (result.success) {
     revalidatePath(studentsRoutes.students);
     revalidateTag(studentsRoutes.students);
-
-    return {
-      success: true,
-      message: `Alunos deletados com sucesso.`,
-      data: response,
-    };
-  } catch (error) {
-    console.error("Erro ao deletar alunos:", error);
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "Erro ao deletar alunos. Tente novamente mais tarde.";
-    return {
-      success: false,
-      error: errorMessage,
-    };
   }
+
+  await logResult(result, "deleteStudentsInBatchAction");
+  return result;
 }

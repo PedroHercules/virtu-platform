@@ -5,7 +5,7 @@ import { Result } from "@/types/result";
 export async function createStudentService(
   data: StudentDTO
 ): Promise<Result<StudentEntity>> {
-  const response = await makeApiRequest("/students", {
+  const response = await makeApiRequest<StudentEntity>("/students", {
     method: "POST",
     body: JSON.stringify(data),
   });

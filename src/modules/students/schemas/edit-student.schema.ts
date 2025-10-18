@@ -7,7 +7,7 @@ export const editStudentSchema = z.object({
   document: z.string().optional(),
   planId: z.string().optional(),
   graduationId: z.string().optional(),
-  status: z.enum(["active", "inactive"]).optional(),
+  status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
 });
 
 export type EditStudentFormData = z.infer<typeof editStudentSchema>;

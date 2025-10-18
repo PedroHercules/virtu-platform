@@ -13,7 +13,7 @@ export async function getGraduationsService(): Promise<
     throw new Error("Não autorizado");
   }
 
-  const data = await makeApiRequest("/graduations/levels");
+  const data = await makeApiRequest<GraduationEntity[]>("/graduations/levels");
 
   return data;
 }

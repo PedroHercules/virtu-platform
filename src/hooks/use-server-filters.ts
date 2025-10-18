@@ -20,11 +20,9 @@ interface UseServerFiltersOptions<TData, TFilters extends FieldValues> {
     limit: number;
     search: string;
   };
-  fetchAction: (filters: Record<string, unknown>) => Promise<{
-    success: boolean;
-    data?: Result<PaginatedResponse<TData>>;
-    error?: string;
-  }>;
+  fetchAction: (
+    filters: Record<string, unknown>
+  ) => Promise<Result<PaginatedResponse<TData>>>;
   filtersForm: UseFormReturn<TFilters>;
   searchFieldName?: string;
   debounceDelay?: number;
@@ -73,7 +71,7 @@ export function useServerFilters<
         });
 
         if (response.success && response.data) {
-          setData(response.data.data);
+          setData(response.data);
         }
       } finally {
         setIsLoading(false);

@@ -2,7 +2,7 @@ export interface StudentDTO {
   name: string;
   email: string;
   phone: string;
-  status?: "active" | "inactive";
+  status?: "ACTIVE" | "INACTIVE";
   document?: string;
   graduationId?: string;
   planId?: string;
@@ -23,7 +23,7 @@ export interface StudentEntity {
   name: string;
   email: string;
   phone: string;
-  status: "active" | "inactive";
+  status: "ACTIVE" | "INACTIVE";
   document?: string;
   graduationId?: string;
   planId?: string;
@@ -45,7 +45,7 @@ export interface StudentsFiltersDTO {
 
 interface UpdateStudentStatusDTO {
   studentsIds: string[];
-  status: "active" | "inactive";
+  status: "ACTIVE" | "INACTIVE";
 }
 
 interface StudentPlanEntity {

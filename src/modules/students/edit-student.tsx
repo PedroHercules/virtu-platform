@@ -90,8 +90,8 @@ export const EditStudent: React.FC<EditStudentProps> = ({
 
   // Opções de status
   const statusOptions = [
-    { value: "active", label: "Ativo" },
-    { value: "inactive", label: "Inativo" },
+    { value: "ACTIVE", label: "Ativo" },
+    { value: "INACTIVE", label: "Inativo" },
   ];
 
   // Função para formatar telefone durante a digitação
@@ -165,23 +165,19 @@ export const EditStudent: React.FC<EditStudentProps> = ({
   const onSubmit = async (data: EditStudentFormData) => {
     setIsSubmitting(true);
 
-    try {
-      await updateStudentAction(student.id, {
-        ...data,
-      });
-      setIsEditing(false);
-      setShowSuccessModal(true);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Erro ao atualizar aluno";
+    const response = await updateStudentAction(student.id, {
+      ...data,
+    });
+    setIsEditing(false);
+    if (!response.success) {
       setErrorModal({
         open: true,
-        message: errorMessage,
+        message: response.message,
         details:
           "Verifique os dados inseridos e tente novamente. Se o problema persistir, entre em contato com o suporte técnico.",
       });
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      setShowSuccessModal(true);
     }
   };
 
@@ -239,12 +235,12 @@ export const EditStudent: React.FC<EditStudentProps> = ({
               </h1>
               <div
                 className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  student.status === "active"
+                  student.status === "ACTIVE"
                     ? "bg-success/20 text-success border border-success/30"
                     : "bg-destructive/20 text-destructive border border-destructive/30"
                 }`}
               >
-                {student.status === "active" ? "Ativo" : "Inativo"}
+                {student.status === "ACTIVE" ? "Ativo" : "Inativo"}
               </div>
             </div>
             <p className="text-foreground/60 font-medium">
@@ -508,7 +504,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                                 onValueChange={(value) => {
                                   if (isEditing && value) {
                                     field.onChange(
-                                      value as "active" | "inactive"
+                                      value as "ACTIVE" | "INACTIVE"
                                     );
                                   }
                                 }}

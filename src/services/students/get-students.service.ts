@@ -29,7 +29,7 @@ export async function getStudentsService(
 
   const url = `/students${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
 
-  const data = await makeApiRequest(url, {
+  const data = await makeApiRequest<StudentPaginatedResponse>(url, {
     method: "GET",
   });
 
