@@ -69,7 +69,9 @@ export const EditStudent: React.FC<EditStudentProps> = ({
       phone: student.phone, // Não temos phone nos dados mock
       document: student.document,
       planId: student.Subscription?.[0]?.planId,
-      graduationId: student.StudentGraduation?.[0]?.graduationId, // Não temos graduationId nos dados mock
+      graduationId: student.StudentGraduation?.find(
+        (graduation) => graduation.isCurrent === true,
+      )?.graduationId,
       status: student.status,
     },
   });
@@ -366,7 +368,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                                 onChange={(e) => {
                                   if (isEditing) {
                                     const formatted = formatDocument(
-                                      e.target.value
+                                      e.target.value,
                                     );
                                     field.onChange(formatted);
                                   }
@@ -404,7 +406,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                                 onChange={(e) => {
                                   if (isEditing) {
                                     const formatted = formatPhone(
-                                      e.target.value
+                                      e.target.value,
                                     );
                                     field.onChange(formatted);
                                   }
@@ -504,7 +506,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                                 onValueChange={(value) => {
                                   if (isEditing && value) {
                                     field.onChange(
-                                      value as "ACTIVE" | "INACTIVE"
+                                      value as "ACTIVE" | "INACTIVE",
                                     );
                                   }
                                 }}
@@ -574,7 +576,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                   </p>
                   <p className="font-semibold text-foreground">
                     {getExpirationDate(
-                      new Date(student.createdAt).toISOString()
+                      new Date(student.createdAt).toISOString(),
                     )}
                   </p>
                 </div>
@@ -604,7 +606,7 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                     <p className="font-semibold text-foreground flex items-center gap-2 text-sm">
                       <Clock size={14} className="text-accent" />
                       {getTimeSinceRegistration(
-                        new Date(student.createdAt).toISOString()
+                        new Date(student.createdAt).toISOString(),
                       )}
                     </p>
                   </div>
@@ -613,13 +615,13 @@ export const EditStudent: React.FC<EditStudentProps> = ({
                   <div>
                     <p className="text-sm text-foreground/60">Tempo Ativo</p>
                     <p className="font-semibold text-foreground flex items-center gap-2 text-sm">
-                      {student.activeTime || "N/A"}
+                      {`${student.daysActive} dias`}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-foreground/60">Tempo Inativo</p>
                     <p className="font-semibold text-foreground flex items-center gap-2 text-sm">
-                      {student.inactiveTime || "N/A"}
+                      {`${student.daysInactive} dias`}
                     </p>
                   </div>
                 </div>

@@ -5,7 +5,7 @@ import { makeApiRequest } from "@/lib/api-client";
 import { Result } from "@/types/result";
 
 export async function getStudentByIdService(
-  id: string
+  id: string,
 ): Promise<Result<StudentEntity>> {
   const session = await getServerSession(authOptions);
 

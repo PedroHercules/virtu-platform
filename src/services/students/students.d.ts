@@ -27,8 +27,8 @@ export interface StudentEntity {
   document?: string;
   graduationId?: string;
   planId?: string;
-  activeTime?: number;
-  inactiveTime?: number;
+  daysActive?: number;
+  daysInactive?: number;
   createdAt: Date;
   updatedAt: Date;
   Subscription?: StudentSubscriptionEntity[];

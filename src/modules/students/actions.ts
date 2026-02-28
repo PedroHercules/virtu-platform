@@ -28,8 +28,9 @@ export async function createStudentAction(data: StudentDTO) {
 
 export async function updateStudentAction(
   id: string,
-  data: Partial<StudentDTO>
+  data: Partial<StudentDTO>,
 ) {
+  console.log(data);
   const result = await updateStudentService(id, data);
 
   if (result.success) {
@@ -42,7 +43,7 @@ export async function updateStudentAction(
 }
 
 export async function updateStudentStatusBatchAction(
-  data: UpdateStudentStatusDTO
+  data: UpdateStudentStatusDTO,
 ) {
   const result = await updateStudentStatusBatchService(data);
 
