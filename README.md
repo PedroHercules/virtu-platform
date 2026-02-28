@@ -2,7 +2,7 @@
 
 A **Virtu Platform** é uma aplicação web moderna desenvolvida para gerenciamento de academias de artes marciais. Sistema completo que oferece controle total sobre alunos, graduações, planos e assinaturas, construído com foco na experiência do usuário e performance.
 
-## 💪 Sobre o Projeto
+## 💪 Sobre o projeto
 
 O Virtu é um sistema completo para gestão de academias de artes marciais, permitindo o controle de:
 
